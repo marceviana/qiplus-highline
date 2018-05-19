@@ -1,0 +1,35 @@
+/**
+ * Styles for the Header.js component
+ */
+
+header {
+  .logo {
+    position: absolute;
+    right: -20%;
+    top: 2px;
+  }
+}
+
+.navbar-brand {
+  position: relative;
+  font-size: 1.2rem;
+}
+
+.fixed-top.navbar {
+  background: linear-gradient(5deg, $orange 30%, $pink 100%);
+  box-shadow: 0 0 5px #999;
+}
+
+
+.dropdown-item {
+  &, a {
+    text-decoration: none !important;
+  }
+
+  .active, &:active {
+    &, a {
+      color: #fff;
+    }
+  }
+}
+
