@@ -133,7 +133,7 @@ class PostNew extends React.Component {
 
   render() {
     const {
-      content, hasFocus, downloadURL, progress,
+      content, hasFocus, downloadURL, progress, metadata,
     } = this.state;
 
     const rows = hasFocus || content ? 4 : 1;
@@ -141,7 +141,12 @@ class PostNew extends React.Component {
     return (
       <FormGroup style={{ marginTop: 15 }}>
         {
-          downloadURL && <div className="post-img"><img src={downloadURL} alt="My upload" /></div>
+          downloadURL && (
+            metadata.contentType && metadata.contentType.indexOf('vid') ?
+              <div className="post-video"><video width="100%" controls><source src={downloadURL} type={metadata.contentType} /></video></div>
+            :
+              <div className="post-img"><img src={downloadURL} alt="My upload" /></div>
+          )
         }
         {
           !!progress && Number(progress) < 100 && <div className="upload-progress"><span style={{ width: `${progress}%` }} /></div>

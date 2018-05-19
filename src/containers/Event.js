@@ -49,9 +49,7 @@ class EventView extends Component {
     posts: [],
   }
 
-  componentDidMount = () => this.fetchParticipants(this.participantIds);
-
-  participantIds = extractParticipantIds(this.props.events.event);
+  componentDidMount = () => this.fetchParticipants(extractParticipantIds(this.props.events.event));
 
   newComment = commentData =>
     this.props.addComment(commentData).then(this.props.getPosts(extractId(this.props.events)));
@@ -59,11 +57,14 @@ class EventView extends Component {
   newPost = postData =>
     this.props.addPost(postData).then(this.props.getPosts(extractId(this.props.events)));
 
+  toggleLike = postData =>
+    this.props.toggleLike(postData).then(this.props.getPosts(extractId(this.props.events)));
+
   /**
     * Fetch Data from API, saving to Redux
     */
   fetchEvents = () => this.props.getEvents()
-    .then(this.fetchParticipants(this.participantIds))
+    .then(this.fetchParticipants(extractParticipantIds(this.props.events.event)))
     .catch((err) => {
       console.log(`Error: ${err}`);
       return this.props.setEventsError(err);
@@ -94,7 +95,7 @@ class EventView extends Component {
         loading={event.loading}
         loadingData={event.loadingData}
         member={member}
-        likeFn={this.props.toggleLike}
+        likeFn={this.toggleLike}
         uploadFn={this.props.uploadFile}
         wpUsers={event.wpUsers}
         participants={events.event.participants}

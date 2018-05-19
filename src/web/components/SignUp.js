@@ -68,75 +68,70 @@ class SignUp extends React.Component {
       <div>
         <Row>
           <Col lg={{ size: 6, offset: 3 }}>
-            <Card>
-              <CardHeader>Sign Up</CardHeader>
+            <Card style={{ marginTop: 20 }}>
+              <CardHeader>Registro</CardHeader>
               <CardBody>
                 {!!error && <Alert color="danger">{error}</Alert>}
                 <Form onSubmit={this.handleSubmit}>
                   <FormGroup>
-                    <Label for="firstName">First Name</Label>
                     <Input
                       type="text"
                       name="firstName"
                       id="firstName"
-                      placeholder="John"
+                      placeholder="Nome"
                       value={this.state.firstName}
                       onChange={this.handleChange}
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="lastName">Last Name</Label>
                     <Input
                       type="text"
                       name="lastName"
                       id="lastName"
-                      placeholder="Doe"
+                      placeholder="Sobrenome"
                       value={this.state.lastName}
                       onChange={this.handleChange}
                     />
                   </FormGroup>
 
                   <FormGroup style={{ marginTop: 40 }}>
-                    <Label for="email">Email</Label>
                     <Input
                       type="email"
                       name="email"
                       id="email"
-                      placeholder="john@doe.corp"
+                      placeholder="Email"
                       value={this.state.email}
                       onChange={this.handleChange}
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="password">Password</Label>
                     <Input
                       type="password"
                       name="password"
                       id="password"
-                      placeholder="••••••••"
+                      placeholder="Senha"
                       value={this.state.password}
                       onChange={this.handleChange}
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="password2">Confirm Password</Label>
                     <Input
                       type="password"
                       name="password2"
                       id="password2"
-                      placeholder="••••••••"
+                      placeholder="Confirmar Senha"
                       value={this.state.password2}
                       onChange={this.handleChange}
                     />
                   </FormGroup>
-                  <Button color="primary">Sign Up!</Button>
+                  <Button block color="primary">Criar minha conta no QI Plus!</Button>
                 </Form>
 
                 <hr />
 
                 <Row>
                   <Col sm="12">
-                    Already have an account? <Link to="/login">Login</Link>
+                    Já possui um usuário no QI Plus? <Link to="/login">Login</Link>
                   </Col>
                 </Row>
               </CardBody>

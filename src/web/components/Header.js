@@ -4,6 +4,7 @@ import {
   Nav,
   Navbar,
   Collapse,
+  NavItem,
   DropdownMenu,
   DropdownItem,
   NavbarToggler,
@@ -56,36 +57,35 @@ class Header extends Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <div className="d-block d-sm-none">
-                {SidebarNavItems()}
+                <NavItem>
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname === '/' && 'active'}`} to="/">
+                    <i className="icon-home" /> <span>Home</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname.startsWith('/event') && 'active'}`} to="/events">
+                    <i className="icon-calendar" /> <span>Eventos</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  {loggedIn ? 
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname === '/login' && 'active'}`} to="/login">
+                    <i className="icon-login" /> <span>Login</span>
+                  </Link> :
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname === '/login' && 'active'}`} to="/logout">
+                      <i className="icon-logout" /> <span>Sair</span>
+                  </Link>
+                  }
+                </NavItem>
+
+                <NavItem>
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname.startsWith('/sign-up') && 'active'}`} to="/sign-up">
+                    <i className="icon-user-following" /> <span>Criar uma conta</span>
+                  </Link>
+                </NavItem>
+
               </div>
-              <UncontrolledDropdown nav>
-                <DropdownToggle nav caret>
-                  {loggedIn ? `Hi, ${member.firstName}` : 'My Account'}
-                </DropdownToggle>
-                <DropdownMenu>
-                  {!loggedIn &&
-                    <div>
-                      <DropdownItem>
-                        <Link to="/login">Login</Link>
-                      </DropdownItem>
-                      <DropdownItem>
-                        <Link to="/sign-up">Sign Up</Link>
-                      </DropdownItem>
-                    </div>
-                  }
-                  {loggedIn &&
-                    <div>
-                      <DropdownItem>
-                        <Link to="/update-profile">Update Profile</Link>
-                      </DropdownItem>
-                      <DropdownItem divider />
-                      <DropdownItem>
-                        <a onClick={this.onLogout}>Logout</a>
-                      </DropdownItem>
-                    </div>
-                  }
-                </DropdownMenu>
-              </UncontrolledDropdown>
+
             </Nav>
           </Collapse>
         </Navbar>

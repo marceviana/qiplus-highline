@@ -40,7 +40,9 @@ export function addComment(commentData) {
 
   console.log('commentData', commentData);
 
-  if (!content || Firebase === null) return () => new Promise(resolve => resolve());
+  if (!user || !eventId || !postId || Firebase === null) {
+    return () => new Promise(resolve => resolve());
+  }
 
   setLoading();
 
@@ -86,23 +88,28 @@ export function addPost(postData) {
 
 export function toggleLike(likeData) {
   const {
-    user, content, eventId, postId,
+    user, eventId, postId,
   } = likeData;
 
   console.log('likeData', likeData);
 
-  if (!content || Firebase === null) return () => new Promise(resolve => resolve());
+  if (!user || !eventId || !postId || Firebase === null) {
+    return () => new Promise(resolve => resolve());
+  }
 
   const postRef = FirebaseRef.child(`events/${eventId}/posts/${postId}`);
 
   const pushToKey = (snapshot) => {
     const post = snapshot.val();
-    const likes = post.likes || [];
+    const uId = Number(user);
+    let likes = post.likes || [];
 
-    if (likes.indexOf(user) >= 0) {
-      likes.splice(likes.indexOf(user), 1);
+    likes = likes.map(u => Number(u));
+
+    if (likes.indexOf(uId) >= 0) {
+      likes.splice(likes.indexOf(uId), 1);
     } else {
-      likes.push({ user });
+      likes.push(uId);
     }
 
     post.likes = likes;

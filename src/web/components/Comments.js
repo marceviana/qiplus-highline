@@ -158,7 +158,7 @@ class Comments extends React.Component {
           <Row>
             <Col xs="12">
               <label htmlFor="button" style={styles.label}>
-                <Button className="bg-qi" onClick={() => this.toggleLike()} style={styles.button}><i className="icon-like" /></Button>
+                <Button className={post.likes && post.likes.indexOf(currentUser) >= 0 ? 'bg-qi' : ''} onClick={() => this.toggleLike()} style={styles.button}><i className="icon-like" /></Button>
                 {post.likes && post.likes.length &&
                   <Badge style={styles.badge} pill>{post.likes.length}</Badge>
                 }

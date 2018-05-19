@@ -52,6 +52,8 @@ body {
   color: $white;
   background-color: $pink;
 }
+.bg-qi:focus,
+.bg-qi:active,
 .bg-qi.active{
   background-color: $orange;
 }
@@ -123,9 +125,21 @@ body {
 /*end fileinput-button */
 
 .post-img {
+  margin-bottom: 15px;
   img {
     max-width: 100%;
-    margin-bottom: 15px;
+  }
+}
+.post-video {
+  position: relative;
+  padding-top: 75%;
+  margin-bottom: 15px;
+  video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
   }
 }
 

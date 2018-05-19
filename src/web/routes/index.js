@@ -46,17 +46,17 @@ const Index = () => (
     <Route
       path="/sign-up"
       render={props => (
-        <TemplateNothing>
+        <TemplateSidebar>
           <SignUpContainer {...props} Layout={SignUpComponent} />
-        </TemplateNothing>
+        </TemplateSidebar>
       )}
     />
     <Route
       path="/login"
       render={props => (
-        <TemplateNothing>
+        <TemplateSidebar>
           <LoginContainer {...props} Layout={LoginComponent} />
-        </TemplateNothing>
+        </TemplateSidebar>
       )}
     />
     <Route

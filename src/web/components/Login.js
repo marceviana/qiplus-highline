@@ -69,7 +69,7 @@ class Login extends React.Component {
       <div>
         <Row>
           <Col lg={{ size: 6, offset: 3 }}>
-            <Card>
+            <Card style={{ marginTop: 20 }}>
               <CardHeader>Login</CardHeader>
               <CardBody>
                 {!!error && <Alert color="danger">{error}</Alert>}
@@ -102,11 +102,11 @@ class Login extends React.Component {
                 <hr />
 
                 <Row>
-                  <Col sm="6">
+                  {/* <Col sm="6">
                     Need an account? <Link to="/sign-up">Sign Up</Link>
-                  </Col>
-                  <Col sm="6" className="text-right">
-                    <Link to="/forgot-password">Forgot Password?</Link>
+                  </Col> */}
+                  <Col xs="12" className="text-right">
+                    <Link to="/forgot-password">Esqueci minha senha</Link>
                   </Col>
                 </Row>
               </CardBody>
