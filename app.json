@@ -1,8 +1,8 @@
 {
   "expo": {
     "sdkVersion": "26.0.0",
-    "name": "QI Plus Highline",
-    "slug": "qi-plus-highline",
+    "name": "Live QI Plus",
+    "slug": "qi-plus-live",
     "icon": "src/images/app-icon.png",
     "privacy": "public"
   }

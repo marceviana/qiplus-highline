@@ -118,12 +118,15 @@ class PostNew extends React.Component {
 
     if (!content) return;
 
+    const type = (metadata && metadata.contentType) || '';
+    const src = downloadURL || '';
+
     onSubmit({
       ...post,
       content,
       user,
       datetime: moment().format('YYYY-MM-DD hh:mm:ss'),
-      media: [{ type: metadata.contentType, src: downloadURL }],
+      media: [{ type, src }],
     });
 
     setTimeout(() => {
@@ -142,8 +145,8 @@ class PostNew extends React.Component {
       <FormGroup style={{ marginTop: 15 }}>
         {
           downloadURL && (
-            metadata.contentType && metadata.contentType.indexOf('vid') ?
-              <div className="post-video"><video width="100%" controls><source src={downloadURL} type={metadata.contentType} /></video></div>
+            metadata.contentType && metadata.contentType.indexOf('vid') >= 0 ?
+              <div className="post-video"><video width="100%" controls><track kind="captions" /><source src={downloadURL} type={metadata.contentType} /></video></div>
             :
               <div className="post-img"><img src={downloadURL} alt="My upload" /></div>
           )

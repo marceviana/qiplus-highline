@@ -30,12 +30,23 @@ const Avatar = ({ user, wpUsers, style }) => {
   );
 };
 
+const Counter = ({ count }) => {
+  if (!Array.isArray(count) || !count.length) return null;
+  return (
+    <Badge primary>
+      <Text>{count.length.toString()}</Text>
+    </Badge>
+  )
+}
+
 class Comments extends React.Component {
   static propTypes = {
     commentId: PropTypes.string.isRequired,
     post: PropTypes.shape({}).isRequired,
     wpUsers: PropTypes.shape(),
     onSubmit: PropTypes.func.isRequired,
+    onLike: PropTypes.func.isRequired,
+    currentUser: PropTypes.number.isRequired,
   }
 
   static defaultProps = {
@@ -58,18 +69,16 @@ class Comments extends React.Component {
     this.handleComments = this.handleComments.bind(this);
   }
 
-  onPress = item => item;
-
   handleChange = (name, val) => {
     this.setState({
       ...this.state,
       [name]: val,
     });
   }
-  handleFocus = (val) => {
+  handleFocus = () => {
     this.setState({
       ...this.state,
-      hasFocus: !!val,
+      hasFocus: !this.state.hasFocus,
     });
   }
   handleOpen = (val) => {
@@ -83,6 +92,10 @@ class Comments extends React.Component {
       ...this.state,
       loaded: val,
     });
+  }
+  toggleLike = () => {
+    const { onLike, post } = this.props;
+    onLike(post);
   }
 
   send = () => {
@@ -101,7 +114,7 @@ class Comments extends React.Component {
 
   render() {
     const {
-      commentId, post, wpUsers,
+      commentId, post, wpUsers, currentUser,
     } = this.props;
 
     const {
@@ -113,16 +126,12 @@ class Comments extends React.Component {
         <CardItem>
           <Button
             transparent
-            onPress={() => this.handleOpen(!isOpen)}
+            onPress={() => this.toggleLike()}
             style={styles.iconButton}
           >
-            <SimpleLineIcon size={20} name="like" />
+            <SimpleLineIcon size={20} name="like" style={{ color: (post.likes && post.likes.indexOf(currentUser) >= 0 ? '#ee1d67' : '') }} />
           </Button>
-          {!!post.likes && !!post.likes.length &&
-            <Badge primary>
-              <Text>{post.likes.length.toString()}</Text>
-            </Badge>
-          }
+          <Counter primary count={post.likes} />
           <Button
             transparent
             onPress={() => this.handleOpen(!isOpen)}
@@ -131,14 +140,10 @@ class Comments extends React.Component {
           >
             <FontAwesomeIcon size={20} name="comment-o" />
           </Button>
-          {!!post.comments && !!post.comments.length &&
-            <Badge primary>
-              <Text>{post.comments.length.toString()}</Text>
-            </Badge>
-          }
+          <Counter primary count={post.comments} />
         </CardItem>
 
-        {!!post.comments && !!post.comments.length && post.comments.map((comment, index) => {
+        {(!!post.comments && !!post.comments.length && post.comments.map((comment, index) => {
           const { user } = comment;
           const i = index + 1;
 
@@ -155,22 +160,37 @@ class Comments extends React.Component {
                 </CardItem>
               );
             }
-            return '';
-          })
+            return null;
+          }) ) || null
         }
 
-        {!!isOpen && !!post.comments && post.comments.length > loaded &&
-        <CardItem>
-          <Button
-            style={{ borderRadius: 0 }}
-            onPress={() => this.handleComments(loaded + 5)}
-          >
-            {translate('load_more')}
-          </Button>
-        </CardItem>
+        {(!!isOpen && !!post.comments && post.comments.length > loaded && (
+          <CardItem>
+            <Button
+              style={{ borderRadius: 0, flex: 1 }}
+              onPress={() => this.handleComments(loaded + 5)}
+            >
+              <Text>{translate('load_more')}</Text>
+            </Button>
+          </CardItem>
+        ) ) || null 
         }
 
-        {!!isOpen &&
+        {/* <Comment item={post.comments}> */}
+        {(!!isOpen && !!post.comments && post.comments.length > loaded &&
+          post.comments[post.comments.length - 1].user === currentUser &&
+          <CardItem>
+            <Avatar style={{ flex: 0.25 }} user={currentUser} wpUsers={wpUsers} />
+            <Body style={{ flex: 0.75 }}>
+              <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                {(!!wpUsers[currentUser] && wpUsers[currentUser].display_name) || ''}
+              </Text>
+              <Text style={{ fontSize: 13 }}>{post.comments[post.comments.length - 1].content || ''}</Text>
+            </Body>
+          </CardItem>) || null
+        }
+
+        {(!!isOpen &&
         <CardItem style={{ marginTop: 5 }}>
           <Form style={{ alignSelf: 'stretch', flex: 1 }}>
             <View style={{ flex: 0.75 }}>
@@ -189,12 +209,12 @@ class Comments extends React.Component {
               />
             </View>
             <View style={{ flex: 0.25, marginTop: 5 }}>
-              <Button onClick={() => this.send()}>
+              <Button onPress={() => this.send()}>
                 <Icon name="paper-plane" />
               </Button>
             </View>
           </Form>
-        </CardItem>
+        </CardItem>) || null
         }
 
       </View>

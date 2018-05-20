@@ -3,8 +3,8 @@ import Store from '../store/recipes';
 export const initialState = Store;
 
 export default function recipeReducer(state = initialState, action) {
-  
-  console.log(action)
+
+  console.log(action.type)
 
   switch (action.type) {
     case 'FAVOURITES_REPLACE': {

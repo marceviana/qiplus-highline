@@ -150,7 +150,12 @@ const EventView = (props) => {
   const cards = timeline.slice(0).reverse().map(post => (
     post.username &&
     <Card style={{ marginTop: 60 }} key={`${post.id}`}>
-      {!!post.media && !!post.media[0] && !!post.media[0].src && <CardImg top src={post.media[0].src} />}
+      {!!post.media && !!post.media[0] && !!post.media[0].src && (
+        post.media[0].type && post.media[0].type.indexOf('vid') >= 0 ?
+          <div className="post-video"><video width="100%" controls><track kind="captions" /><source src={post.media[0].src} type={post.media[0].type} /></video></div>
+        :
+          <CardImg top src={post.media[0].src} />
+      )}
       <CardBody style={styles.cardBody}>
         <Badge style={styles.dateTime}>{dateFormat(post.datetime)}</Badge>
         <Avatar style={styles.avatar} user={post.user}/>
