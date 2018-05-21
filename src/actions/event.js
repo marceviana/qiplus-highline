@@ -10,6 +10,26 @@ export function showLoader() {
   };
 }
 
+export function listenToEvent(eventId) {
+  if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
+  
+  console.log('eventId', eventId);
+
+  const ref = FirebaseRef.child(`events/${eventId}/posts`);
+
+  return dispatch => new Promise((resolve, reject) =>
+    ref.on('value', (snapshot) => {
+      const posts = snapshot.val() || {};
+
+      console.log('posts', posts);
+
+      return resolve(dispatch({
+        type: 'POSTS_REPLACE',
+        data: posts,
+      }));
+    })).catch(e => console.log(e));
+}
+
 export function getPosts(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
@@ -20,10 +40,10 @@ export function getPosts(eventId) {
       .then((snapshot) => {
         const posts = snapshot.val() || {};
 
-        return resolve(dispatch({
-          type: 'POSTS_REPLACE',
-          data: posts,
-        }));
+        // return resolve(dispatch({
+        // type: 'POSTS_REPLACE',
+        // data: posts,
+        // }));
       }).catch(reject)).catch(e => console.log(e));
 }
 
@@ -38,7 +58,7 @@ export function addComment(commentData) {
     user, content, eventId, postId,
   } = commentData;
 
-  console.log('commentData', commentData);
+  // console.log('commentData', commentData);
 
   if (!user || !eventId || !postId || Firebase === null) {
     return () => new Promise(resolve => resolve());

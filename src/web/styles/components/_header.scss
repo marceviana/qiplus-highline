@@ -16,13 +16,14 @@ header {
 }
 
 .fixed-top.navbar {
-  background: linear-gradient(5deg, $orange 30%, $pink 100%);
+  background: linear-gradient(1deg, $orange 30%, $pink 100%);
   box-shadow: 0 0 15px #333;
   display: flex;
   justify-content: center;
   .navbar-toggler{
     position: absolute;
-    right: 15px;
+    top: 0.6rem;
+    right: 0.75rem;
     padding: 0.25rem;
     font-size: 1rem;
   }

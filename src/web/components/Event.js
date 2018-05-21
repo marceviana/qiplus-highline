@@ -18,11 +18,12 @@ import Loading from './Loading';
 import Error from './Error';
 import Comments from './Comments';
 import PostNew from './PostNew';
-
+import EventNavBar from './EventNavBar';
 
 const EventView = (props) => {
   const {
     locale,
+    location,
     currentUser,
     error,
     loading,
@@ -36,6 +37,7 @@ const EventView = (props) => {
     participants,
     wpUsers,
     posts,
+    notes,
   } = props;
 
   // Loading
@@ -53,7 +55,9 @@ const EventView = (props) => {
   // event not found
   if (!event) return <Error content={ErrorMessages.event404} />;
 
-  const timeline = (posts.length && posts) || event.posts;
+  const isPit = location.pathname.indexOf('notes') >= 0;
+
+  const timeline = (!isPit && ((posts.length && posts) || event.posts)) || event.notes;
 
   const Avatar = ({ user, style }) => {
     if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>
@@ -93,6 +97,16 @@ const EventView = (props) => {
   };
 
   const styles = {
+    topBanner: {
+      position: 'fixed',
+      top: '3.4rem',
+      left: 0,
+      zIndex: 1000,
+    },
+    mainCard: {
+      zIndex: 100,
+      paddingTop: '33.333%',
+    },
     cardBody: {
       position: 'relative',
       fontSize: 12,
@@ -160,7 +174,15 @@ const EventView = (props) => {
         <Badge style={styles.dateTime}>{dateFormat(post.datetime)}</Badge>
         <Avatar style={styles.avatar} user={post.user}/>
         <CardTitle style={styles.userName}>{post.username}</CardTitle>
-        <CardText style={{ fontSize: 13 }}>{post.content}</CardText>
+        <CardText style={{ fontSize: 13 }}>
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        </CardText>
+        {(isPit && post.action_link && (
+          <CardFooter style={{ fontSize: 13 }}>
+            <a href="post.action_link">{post.action_link}</a>
+          </CardFooter>
+        )) || null
+        }
       </CardBody>
       <Comments
         wpUsers={wpUsers} 
@@ -178,24 +200,27 @@ const EventView = (props) => {
   return (
     <div>
       <Row>
-        <Col sm="12" style={{ marginTop: 20 }}>
-          <Card>
-            <Link to={`/event/${event.id}`}>
+        <Col sm="12" className="pl-0 pr-0">
+          <Card style={styles.mainCard}>
+            <div style={styles.topBanner}>
               <CardImg top src={event.banner} alt={event.title} />
-            </Link>
+            </div>
             <CardBody>
               <CardTitle>{event.title}</CardTitle>
               <CardText>{event.description}</CardText>
             </CardBody>
-            <CardFooter style={{ fontSize: 13 }}>
-              <PostNew
-                user={currentUser}
-                eventId={eventId}
-                onSubmit={newPost}
-                uploadFn={uploadFn}
-                {...props}
-              />
-            </CardFooter>
+            { (!isPit && (
+              <CardFooter style={{ fontSize: 13 }}>
+                <PostNew
+                  user={currentUser}
+                  eventId={eventId}
+                  onSubmit={newPost}
+                  uploadFn={uploadFn}
+                  {...props}
+                />
+              </CardFooter>
+            )) || null
+            }
           </Card>
         </Col>
       </Row>
@@ -204,6 +229,12 @@ const EventView = (props) => {
           {cards}
         </Col>
       </Row>
+      <EventNavBar
+        eventId={eventId}
+        pathname={location.pathname}
+        postsLen={(event.posts && event.posts.length) || 0}
+        notesLen={(event.notes && event.notes.length) || 0}
+      />
     </div>
   );
 };
@@ -215,11 +246,13 @@ EventView.propTypes = {
   eventId: PropTypes.number.isRequired,
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
+  notes: PropTypes.arrayOf(PropTypes.shape()),
   commentId: PropTypes.string,
   addComment: PropTypes.func.isRequired,
   addPost: PropTypes.func.isRequired,
   likeFn: PropTypes.func.isRequired,
   uploadFn: PropTypes.func.isRequired,
+  location: PropTypes.shape(),
   participants: PropTypes.shape(),
   wpUsers: PropTypes.shape(),
   currentUser: PropTypes.number,
@@ -230,8 +263,10 @@ EventView.defaultProps = {
   commentId: '1',
   locale: null,
   error: null,
+  location: {},
   participants: {},
   posts: [],
+  notes: [],
   wpUsers: {},
 };
 

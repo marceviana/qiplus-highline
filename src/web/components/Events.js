@@ -14,6 +14,15 @@ import { Link } from 'react-router-dom';
 import Error from './Error';
 import { translate } from '../../i18n';
 
+const scrollToTop = () => {
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      window.scrollTo({ top: 0 });
+    }, 100);
+  }
+};
+
+
 const EventListing = ({ error, loading, events, eventSetter }) => {
   // Error
   if (error) return <Error content={error} />;
@@ -21,13 +30,13 @@ const EventListing = ({ error, loading, events, eventSetter }) => {
   // Build Cards for Listing
   const cards = events.map(item => (
     <Card key={`${item.id}`}>
-      <Link onClick={() => eventSetter(item.id)} to={`/event/${item.id}`}>
+      <Link onClick={() => { scrollToTop(); eventSetter(item.id); }} to={`/event/${item.id}`}>
         <CardImg top src={item.banner} alt={item.title} />
       </Link>
       <CardBody>
         <CardTitle>{item.title}</CardTitle>
         <CardText>{item.description}</CardText>
-        <Link onClick={() => eventSetter(item.id)} className="btn btn-primary" to={`/event/${item.id}`}>{translate('view_event')}<i className="icon-arrow-right" /></Link>
+        <Link onClick={() => { scrollToTop(); eventSetter(item.id); }} className="btn btn-primary" to={`/event/${item.id}`}>{translate('view_event')}<i className="icon-arrow-right" /></Link>
       </CardBody>
     </Card>
   ));

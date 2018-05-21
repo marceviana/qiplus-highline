@@ -2,11 +2,14 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: [path.join(__dirname, '../src/web/index')],
+  entry: [
+    'babel-polyfill',
+    path.join(__dirname, '../src/web/index'),
+  ],
   output: {
     path: path.join(__dirname, '../build/'),
     filename: 'bundle.js',
-    publicPath: '/',
+    publicPath: 'http://qiplus.com.br/live/',
   },
   module: {
     loaders: [

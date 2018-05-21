@@ -1,5 +1,7 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+
+import { BrowserRouter } from 'react-router-dom';
+import { Switch, Route } from 'react-router';
 
 // Templates
 import TemplateNothing from '../components/TemplateNothing';
@@ -32,89 +34,100 @@ import UpdateProfileComponent from '../components/UpdateProfile';
 
 import Error from '../components/Error';
 
+
 const Index = () => (
-  <Switch>
-    <Route
-      exact
-      path="/"
-      render={props => (
-        <TemplateSidebar>
-          <Home {...props} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/sign-up"
-      render={props => (
-        <TemplateSidebar>
-          <SignUpContainer {...props} Layout={SignUpComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/login"
-      render={props => (
-        <TemplateSidebar>
-          <LoginContainer {...props} Layout={LoginComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/forgot-password"
-      render={props => (
-        <TemplateNothing>
-          <ForgotPasswordContainer {...props} Layout={ForgotPasswordComponent} />
-        </TemplateNothing>
-      )}
-    />
-    <Route
-      path="/update-profile"
-      render={props => (
-        <TemplateSidebar>
-          <UpdateProfileContainer {...props} Layout={UpdateProfileComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/recipes"
-      render={props => (
-        <TemplateSidebar>
-          <RecipesContainer {...props} Layout={RecipesComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/recipe/:id"
-      render={props => (
-        <TemplateSidebar>
-          <RecipesContainer {...props} Layout={RecipeViewComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/events"
-      render={props => (
-        <TemplateSidebar>
-          <EventsContainer {...props} Layout={EventsComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      path="/event/:id"
-      render={props => (
-        <TemplateSidebar>
-          <EventContainer {...props} Layout={EventViewComponent} />
-        </TemplateSidebar>
-      )}
-    />
-    <Route
-      render={props => (
-        <TemplateSidebar>
-          <Error {...props} title="404" content="Sorry, the route you requested does not exist" />
-        </TemplateSidebar>
-      )}
-    />
-  </Switch>
+  <BrowserRouter basename="/live">
+    <Switch>
+      <Route
+        exact
+        path="/"
+        render={props => (
+          <TemplateSidebar>
+            <Home {...props} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/sign-up"
+        render={props => (
+          <TemplateSidebar>
+            <SignUpContainer {...props} Layout={SignUpComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/login"
+        render={props => (
+          <TemplateSidebar>
+            <LoginContainer {...props} Layout={LoginComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/forgot-password"
+        render={props => (
+          <TemplateNothing>
+            <ForgotPasswordContainer {...props} Layout={ForgotPasswordComponent} />
+          </TemplateNothing>
+        )}
+      />
+      <Route
+        path="/update-profile"
+        render={props => (
+          <TemplateSidebar>
+            <UpdateProfileContainer {...props} Layout={UpdateProfileComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/recipes"
+        render={props => (
+          <TemplateSidebar>
+            <RecipesContainer {...props} Layout={RecipesComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/recipe/:id"
+        render={props => (
+          <TemplateSidebar>
+            <RecipesContainer {...props} Layout={RecipeViewComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/events"
+        render={props => (
+          <TemplateSidebar>
+            <EventsContainer {...props} Layout={EventsComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/event/:id"
+        render={props => (
+          <TemplateSidebar>
+            <EventContainer {...props} Layout={EventViewComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/event/:id/notes"
+        render={props => (
+          <TemplateSidebar>
+            <EventContainer {...props} Layout={EventViewComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        render={props => (
+          <TemplateSidebar>
+            <Error {...props} title="404" content="Sorry, the route you requested does not exist" />
+          </TemplateSidebar>
+        )}
+      />
+    </Switch>
+  </BrowserRouter>
 );
 
 export default Index;

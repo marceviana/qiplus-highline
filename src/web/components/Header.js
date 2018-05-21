@@ -40,6 +40,13 @@ class Header extends Component {
 
   onLogout = () => this.props.logout().then(() => this.props.history.push('/login'));
 
+  getLocation = () => {
+    const currrentLocation = typeof window === 'undefined' ?
+      '/' :
+      window.location.pathname.replace('/live', '');
+    return currrentLocation;
+  };
+
   toggleDropDown = () => this.setState({ isOpen: !this.state.isOpen });
 
   render() {
@@ -58,28 +65,28 @@ class Header extends Component {
             <Nav className="ml-auto" navbar>
               <div className="d-block d-sm-none">
                 <NavItem>
-                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname === '/' && 'active'}`} to="/">
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${this.getLocation() === '/' && 'active'}`} to="/">
                     <i className="icon-home" /> <span>Home</span>
                   </Link>
                 </NavItem>
                 <NavItem>
-                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname.startsWith('/event') && 'active'}`} to="/events">
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${this.getLocation().startsWith('/event') && 'active'}`} to="/events">
                     <i className="icon-calendar" /> <span>Eventos</span>
                   </Link>
                 </NavItem>
                 <NavItem>
                   {loggedIn ? 
-                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname === '/login' && 'active'}`} to="/login">
-                    <i className="icon-login" /> <span>Login</span>
-                  </Link> :
-                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname === '/login' && 'active'}`} to="/logout">
+                    <Link onClick={this.toggleDropDown} className={`nav-link ${this.getLocation() === '/login' && 'active'}`} to="/login">
+                      <i className="icon-login" /> <span>Login</span>
+                    </Link> :
+                    <Link onClick={this.toggleDropDown} className={`nav-link ${this.getLocation() === '/login' && 'active'}`} to="/logout">
                       <i className="icon-logout" /> <span>Sair</span>
-                  </Link>
+                    </Link>
                   }
                 </NavItem>
 
                 <NavItem>
-                  <Link onClick={this.toggleDropDown} className={`nav-link ${window.location.pathname.startsWith('/sign-up') && 'active'}`} to="/sign-up">
+                  <Link onClick={this.toggleDropDown} className={`nav-link ${this.getLocation().startsWith('/sign-up') && 'active'}`} to="/sign-up">
                     <i className="icon-user-following" /> <span>Criar uma conta</span>
                   </Link>
                 </NavItem>

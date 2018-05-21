@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { getEvents, setEventsError } from '../actions/events';
-import { getParticipants, setParticipantsError, addComment, addPost, getPosts, uploadFile, toggleLike } from '../actions/event';
+import { listenToEvent, getParticipants, setParticipantsError, addComment, addPost, getPosts, uploadFile, toggleLike } from '../actions/event';
 
 const extractParticipantIds = ({ participants }) =>
   (participants && Object.keys(participants)) || [];
@@ -13,6 +13,7 @@ const extractId = ({ eventId }) => eventId;
 class EventView extends Component {
   static propTypes = {
     locale: PropTypes.string,
+    location: PropTypes.shape().isRequired,
     Layout: PropTypes.func.isRequired,
     events: PropTypes.shape({
       loading: PropTypes.bool.isRequired,
@@ -32,6 +33,7 @@ class EventView extends Component {
     }),
     member: PropTypes.shape().isRequired,
     posts: PropTypes.arrayOf(PropTypes.shape()),
+    listenToEvent: PropTypes.func.isRequired,
     getEvents: PropTypes.func.isRequired,
     getParticipants: PropTypes.func.isRequired,
     setEventsError: PropTypes.func.isRequired,
@@ -49,7 +51,10 @@ class EventView extends Component {
     posts: [],
   }
 
-  componentDidMount = () => this.fetchParticipants(extractParticipantIds(this.props.events.event));
+  componentDidMount = () => { 
+    this.props.listenToEvent(extractId(this.props.events));
+    this.fetchParticipants(extractParticipantIds(this.props.events.event));
+  };
 
   newComment = commentData =>
     this.props.addComment(commentData).then(this.props.getPosts(extractId(this.props.events)));
@@ -82,11 +87,12 @@ class EventView extends Component {
 
   render = () => {
     const {
-      Layout, events, event, locale, match, member, posts,
+      Layout, location, events, event, locale, match, member, posts,
     } = this.props;
     const id = (match && match.params && match.params.id) ? match.params.id : null;
     return (
       <Layout
+        location={location}
         events={events.events}
         eventId={Number(id)}
         locale={locale}
@@ -117,6 +123,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  listenToEvent,
   toggleLike,
   uploadFile,
   addComment,
