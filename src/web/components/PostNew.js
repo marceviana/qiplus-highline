@@ -116,7 +116,7 @@ class PostNew extends React.Component {
     const { onSubmit, post, user } = this.props;
     const { content, downloadURL, metadata } = this.state;
 
-    if (!content) return;
+    if (!content && !downloadURL) return;
 
     const type = (metadata && metadata.contentType) || '';
     const src = downloadURL || '';

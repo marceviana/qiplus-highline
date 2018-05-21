@@ -51,7 +51,12 @@ body {
 .bg-qi{
   color: $white;
   background-color: $pink;
+  &.btn{
+    border: 0;
+  }
 }
+.btn:active,
+.btn.active,
 .bg-qi:focus,
 .bg-qi:active,
 .bg-qi.active{
@@ -154,3 +159,25 @@ body {
     height: 100%;
   }
 }
+
+.card:not(.header-card){
+  border-radius: 10px;
+  .card-footer{
+    border-radius: 0 0 10px 10px;
+    &.btn-container {
+      background: none;
+    }
+    label {
+      margin-bottom: 0;
+    }
+    .btn.no-bg {
+      background: none;
+      border: 0;
+      color: $light-grey;
+    }
+    .btn i {
+      font-size: 1.3rem;
+    }
+  }
+}
+

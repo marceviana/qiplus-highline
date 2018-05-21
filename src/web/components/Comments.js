@@ -23,10 +23,11 @@ const styles = {
   },
   dateTime: {
     position: 'absolute',
-    top: 5,
-    right: 5,
-    fontWeight: 100,
-    borderRadius: 5,
+    top: '-10px',
+    right: '-15px',
+    fontWeight: '100',
+    borderRadius: '5px',
+    fontSize: '0.6em',
   },
   label: {
     position: 'relative',
@@ -45,7 +46,7 @@ const styles = {
   },
   button: {
     borderRadius: '50%',
-    border: '1px solid',
+    // border: '1px solid',
   },
   avatar: {
     borderRadius: 60,
@@ -78,6 +79,7 @@ class Comments extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     onLike: PropTypes.func.isRequired,
     currentUser: PropTypes.number.isRequired,
+    dateFormatter: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -145,7 +147,7 @@ class Comments extends React.Component {
 
   render() {
     const {
-      commentId, post, wpUsers, currentUser,
+      commentId, post, wpUsers, currentUser, dateFormatter,
     } = this.props;
 
     const {
@@ -154,17 +156,17 @@ class Comments extends React.Component {
 
     return (
       <div>
-        <CardFooter>
+        <CardFooter className="btn-container">
           <Row>
             <Col xs="12">
               <label htmlFor="button" style={styles.label}>
-                <Button className={post.likes && post.likes.indexOf(currentUser) >= 0 ? 'bg-qi' : ''} onClick={() => this.toggleLike()} style={styles.button}><i className="icon-like" /></Button>
+                <Button className={post.likes && post.likes.indexOf(currentUser) >= 0 ? 'bg-qi' : 'no-bg'} onClick={() => this.toggleLike()} style={styles.button}><i className="icon-like" /></Button>
                 {post.likes && post.likes.length &&
                   <Badge style={styles.badge} pill>{post.likes.length}</Badge>
                 }
               </label>
               <label htmlFor="button" style={styles.label}>
-                <Button className="bg-qi" onClick={() => this.handleOpen(!isOpen)} active={!!isOpen} style={styles.button}><i className="icon-bubbles" /></Button>
+                <Button className={post.comments && post.comments.length ? 'bg-qi' : 'no-bg'} onClick={() => this.handleOpen(!isOpen)} active={!!isOpen} style={styles.button}><i className="icon-bubbles" /></Button>
                 {post.comments && post.comments.length &&
                   <Badge style={styles.badge} pill>{post.comments.length}</Badge>
                 }
@@ -181,6 +183,7 @@ class Comments extends React.Component {
             <CardFooter key={i}>
               <div className="comment-wrapper">
                 <Avatar user={user} wpUsers={this.props.wpUsers} />
+                <span style={styles.dateTime}>{dateFormatter(comment.datetime)}</span>
                 <CardTitle style={{ fontSize: 13 }}>
                   {!!wpUsers[user] && wpUsers[user].display_name}
                 </CardTitle>

@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Firebase, FirebaseRef, ImagesRef } from '../lib/firebase';
 
 /**
@@ -83,29 +84,40 @@ export function addComment(commentData) {
 
   // console.log('commentData', commentData);
 
-  if (!user || !eventId || !postId || Firebase === null) {
+  if (!user || !eventId || (!postId && postId !== 0) || Firebase === null) {
     return () => new Promise(resolve => resolve());
   }
 
-  setLoading();
+  return dispatch => new Promise((resolve, reject) => {
+    const childType = postType === 'notes' ? postType : 'posts';
+    const postRef = FirebaseRef.child(`events/${eventId}/${childType}/${postId}`);
 
-  const childType = postType === 'notes' ? postType : 'posts';
-  const postRef = FirebaseRef.child(`events/${eventId}/${childType}/${postId}`);
+    const failureCallback = (e) => {
+      console.log('failureCallback', e);
+      reject(dispatch({
+        type: 'POSTS_ERROR',
+        data: e,
+      }));
+    };
 
-  const pushToKey = (snapshot) => {
-    const post = snapshot.val();
-    const comments = post.comments || [];
+    const pushToKey = (snapshot) => {
+      const post = snapshot.val();
+      const comments = post.comments || [];
+      const nowIso = moment().format('YYYY-MM-DD hh:mm:ss');
 
-    comments.push({ user, content });
-    post.comments = comments;
+      comments.push({ user, content, datetime: nowIso });
+      post.comments = comments;
 
-    postRef.set(post);
-    postRef.off('value', pushToKey);
-  };
+      postRef.set(post);
+      postRef.off('value', pushToKey);
+    };
 
-  postRef.once('value', pushToKey);
+    postRef.once('value', pushToKey, failureCallback);
 
-  return () => new Promise(resolve => resolve());
+    resolve(dispatch({
+      type: 'POSTS_FETCHING',
+    }));
+  }).catch(e => console.log(e));
 }
 
 export function addPost(postData) {
@@ -115,20 +127,39 @@ export function addPost(postData) {
 
   if (!content || !eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
+  return dispatch => new Promise((resolve, reject) => {
+    const childType = postType === 'notes' ? postType : 'posts';
+    const postsRef = FirebaseRef.child(`events/${eventId}/${childType}`);
+    const lastRef = postsRef.orderByKey().limitToLast(1);
 
-  const childType = postType === 'notes' ? postType : 'posts';
-  const postsRef = FirebaseRef.child(`events/${eventId}/${childType}`);
-  const lastRef = postsRef.orderByKey().limitToLast(1);
+    const failureCallback = (e) => {
+      console.log('failureCallback', e);
+      reject(dispatch({
+        type: 'POSTS_ERROR',
+        data: e,
+      }));
+    };
 
-  const addToNextKey = (snapshot) => {
-    const newPostId = snapshot.key && Number(snapshot.key) + 1;
-    postsRef.child(newPostId).set({ ...postData, content, id: newPostId });
-    lastRef.off('child_added', addToNextKey);
-  };
+    const addToNextKey = (snapshot) => {
+      const newPostId = snapshot.key && Number(snapshot.key) + 1;
+      const nowIso = moment().format('YYYY-MM-DD hh:mm:ss');
 
-  lastRef.once('child_added', addToNextKey);
+      postsRef.child(newPostId).set({
+        ...postData,
+        content,
+        id: newPostId,
+        datetime: nowIso,
+      });
 
-  return () => new Promise(resolve => resolve());
+      lastRef.off('child_added', addToNextKey);
+    };
+
+    lastRef.once('child_added', addToNextKey, failureCallback);
+
+    resolve(dispatch({
+      type: 'POSTS_FETCHING',
+    }));
+  }).catch(e => console.log(e));
 }
 
 export function toggleLike(likeData) {
@@ -138,7 +169,7 @@ export function toggleLike(likeData) {
 
   // console.log('likeData', likeData);
 
-  if (!user || !eventId || !postId || Firebase === null) {
+  if (!user || !eventId || (!postId && postId !== 0) || Firebase === null) {
     return () => new Promise(resolve => resolve());
   }
 

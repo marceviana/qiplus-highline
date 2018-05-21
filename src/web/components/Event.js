@@ -20,6 +20,13 @@ import PostNew from './PostNew';
 import EventNavBar from './EventNavBar';
 import Timer from './Timer';
 
+export const dateFormatter = (datetime, locale = 'pt') => {
+  if (!datetime) return '';
+  moment.locale(locale);
+  const formattedDate = moment(datetime).calendar();
+  return formattedDate || '';
+};
+
 const EventView = (props) => {
   const {
     locale,
@@ -65,13 +72,21 @@ const EventView = (props) => {
     if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>;
     return (
       <div style={style} className="avatar-img">
-        { 
+        {
           !!wpUsers[user] && wpUsers[user].avatar &&
           <img alt="" src={wpUsers[user].avatar} />
         }
       </div>
-    )
+    );
   };
+
+  const ActionLink = ({ action_link, deadline }) => (
+    isPitch && action_link && 
+    (!deadline || new Date(deadline).getTime() < new Date().getTime()) && (
+    <CardFooter style={{ fontSize: 13 }}>
+      <Timer href={action_link} deadline={deadline} />
+    </CardFooter>
+    )) || null;
 
   const newComment = (post, content) => {
     addComment({
@@ -157,13 +172,6 @@ const EventView = (props) => {
     },
   };
 
-  const dateFormat = (datetime) => {
-    if (!datetime) return '';
-    moment.locale(locale || 'pt');
-    const formattedDate = moment(datetime).calendar();
-    return formattedDate || '';
-  };
-
   // Build Cards for Listing
   const cards = timeline.slice(0).reverse().map(post => (
     post.username &&
@@ -175,19 +183,15 @@ const EventView = (props) => {
           <CardImg top src={post.media[0].src} />
       )}
       <CardBody style={styles.cardBody}>
-        <Badge style={styles.dateTime}>{dateFormat(post.datetime)}</Badge>
+        <Badge className="bg-qi" style={styles.dateTime}>{dateFormatter(post.datetime)}</Badge>
         <Avatar style={styles.avatar} user={post.user} />
         <CardTitle style={styles.userName}>{post.username}</CardTitle>
         <CardText style={{ fontSize: 13 }}>
           <span dangerouslySetInnerHTML={{ __html: post.content }} />
         </CardText>
-        {(isPitch && post.action_link && (
-          <CardFooter style={{ fontSize: 13 }}>
-            <Timer href={post.action_link} deadline={post.deadline} />
-          </CardFooter>
-        )) || null
-        }
+        <ActionLink post={post} />
       </CardBody>
+
       <Comments
         wpUsers={wpUsers}
         commentId={commentId.toString()}
@@ -195,6 +199,7 @@ const EventView = (props) => {
         post={post}
         onSubmit={newComment}
         onLike={toggleLike}
+        dateFormatter={dateFormatter}
         {...props}
       />
     </Card>
@@ -205,7 +210,7 @@ const EventView = (props) => {
     <div>
       <Row>
         <Col sm="12" className="pl-0 pr-0">
-          <Card style={styles.mainCard}>
+          <Card className="header-card" style={styles.mainCard}>
             <div style={styles.topBanner}>
               <CardImg top src={event.banner} alt={event.title} />
             </div>
@@ -236,8 +241,8 @@ const EventView = (props) => {
       <EventNavBar
         eventId={eventId}
         pathname={location.pathname}
-        postsLen={(event.posts && event.posts.length) || 0}
-        notesLen={(event.notes && event.notes.length) || 0}
+        postsLen={(posts && posts.length) || (event.posts && event.posts.length) || 0}
+        notesLen={(notes && notes.length) || (event.notes && event.notes.length) || 0}
       />
     </div>
   );

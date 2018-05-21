@@ -31,6 +31,13 @@ export default function eventSingleReducer(state = initialState, action) {
         loadingData: true,
       };
     }
+    case 'POSTS_ERROR': {
+      return {
+        ...state,
+        loadingData: false,
+        error: action.data,
+      };
+    }
     case 'WP_USERS_FETCHING': {
       return {
         ...state,
