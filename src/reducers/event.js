@@ -11,6 +11,13 @@ export default function eventSingleReducer(state = initialState, action) {
         loadingData: false,
       };
     }
+    case 'NOTES_REPLACE': {
+      return {
+        ...state,
+        notes: action.data,
+        loadingData: false,
+      };
+    }
     case 'POSTS_REPLACE': {
       return {
         ...state,

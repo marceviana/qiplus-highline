@@ -3,6 +3,7 @@ export default {
   loader: false,
   error: null,
   posts: [],
+  notes: [],
   wpUsers: {
     0: {
       placeholder: true,

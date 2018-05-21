@@ -10,18 +10,16 @@ export function showLoader() {
   };
 }
 
-export function listenToEvent(eventId) {
+export function listenToPosts(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
-  
-  console.log('eventId', eventId);
 
   const ref = FirebaseRef.child(`events/${eventId}/posts`);
 
-  return dispatch => new Promise((resolve, reject) =>
+  return dispatch => new Promise(resolve =>
     ref.on('value', (snapshot) => {
       const posts = snapshot.val() || {};
 
-      console.log('posts', posts);
+      // console.log('posts', posts);
 
       return resolve(dispatch({
         type: 'POSTS_REPLACE',
@@ -30,20 +28,45 @@ export function listenToEvent(eventId) {
     })).catch(e => console.log(e));
 }
 
-export function getPosts(eventId) {
+export function listenToNotes(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
-  const ref = FirebaseRef.child(`events/${eventId}/posts`);
+  const ref = FirebaseRef.child(`events/${eventId}/notes`);
+
+  return dispatch => new Promise(resolve =>
+    ref.on('value', (snapshot) => {
+      const notes = snapshot.val() || {};
+
+      // console.log('notes', notes);
+
+      return resolve(dispatch({
+        type: 'NOTES_REPLACE',
+        data: notes,
+      }));
+    })).catch(e => console.log(e));
+}
+
+export function getPosts(addedData) {
+  // user, eventId, postId, postType,
+  const {
+    eventId, postType,
+  } = addedData;
+
+  if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
+
+  const childType = postType === 'notes' ? postType : 'posts';
+  const ref = FirebaseRef.child(`events/${eventId}/${childType}`);
+  const ACTION_TYPE = postType === 'notes' ? 'NOTES_REPLACE' : 'POSTS_REPLACE';
 
   return dispatch => new Promise((resolve, reject) =>
     ref.once('value')
       .then((snapshot) => {
         const posts = snapshot.val() || {};
 
-        // return resolve(dispatch({
-        // type: 'POSTS_REPLACE',
-        // data: posts,
-        // }));
+        return resolve(dispatch({
+          type: ACTION_TYPE,
+          data: posts,
+        }));
       }).catch(reject)).catch(e => console.log(e));
 }
 
@@ -55,7 +78,7 @@ export function setLoading() {
 
 export function addComment(commentData) {
   const {
-    user, content, eventId, postId,
+    user, content, eventId, postId, postType,
   } = commentData;
 
   // console.log('commentData', commentData);
@@ -66,7 +89,8 @@ export function addComment(commentData) {
 
   setLoading();
 
-  const postRef = FirebaseRef.child(`events/${eventId}/posts/${postId}`);
+  const childType = postType === 'notes' ? postType : 'posts';
+  const postRef = FirebaseRef.child(`events/${eventId}/${childType}/${postId}`);
 
   const pushToKey = (snapshot) => {
     const post = snapshot.val();
@@ -86,13 +110,14 @@ export function addComment(commentData) {
 
 export function addPost(postData) {
   const {
-    content, eventId,
+    content, eventId, postType,
   } = postData;
 
   if (!content || !eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
 
-  const postsRef = FirebaseRef.child(`events/${eventId}/posts`);
+  const childType = postType === 'notes' ? postType : 'posts';
+  const postsRef = FirebaseRef.child(`events/${eventId}/${childType}`);
   const lastRef = postsRef.orderByKey().limitToLast(1);
 
   const addToNextKey = (snapshot) => {
@@ -108,16 +133,17 @@ export function addPost(postData) {
 
 export function toggleLike(likeData) {
   const {
-    user, eventId, postId,
+    user, eventId, postId, postType,
   } = likeData;
 
-  console.log('likeData', likeData);
+  // console.log('likeData', likeData);
 
   if (!user || !eventId || !postId || Firebase === null) {
     return () => new Promise(resolve => resolve());
   }
 
-  const postRef = FirebaseRef.child(`events/${eventId}/posts/${postId}`);
+  const childType = postType === 'notes' ? postType : 'posts';
+  const postRef = FirebaseRef.child(`events/${eventId}/${childType}/${postId}`);
 
   const pushToKey = (snapshot) => {
     const post = snapshot.val();

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { getEvents, setEventsError } from '../actions/events';
-import { listenToEvent, getParticipants, setParticipantsError, addComment, addPost, getPosts, uploadFile, toggleLike } from '../actions/event';
+import { listenToPosts, listenToNotes, getParticipants, setParticipantsError, addComment, addPost, getPosts, uploadFile, toggleLike } from '../actions/event';
 
 const extractParticipantIds = ({ participants }) =>
   (participants && Object.keys(participants)) || [];
@@ -33,7 +33,9 @@ class EventView extends Component {
     }),
     member: PropTypes.shape().isRequired,
     posts: PropTypes.arrayOf(PropTypes.shape()),
-    listenToEvent: PropTypes.func.isRequired,
+    notes: PropTypes.arrayOf(PropTypes.shape()),
+    listenToPosts: PropTypes.func.isRequired,
+    listenToNotes: PropTypes.func.isRequired,
     getEvents: PropTypes.func.isRequired,
     getParticipants: PropTypes.func.isRequired,
     setEventsError: PropTypes.func.isRequired,
@@ -49,21 +51,26 @@ class EventView extends Component {
     locale: null,
     match: null,
     posts: [],
+    notes: [],
   }
 
-  componentDidMount = () => { 
-    this.props.listenToEvent(extractId(this.props.events));
+  componentDidMount = () => {
+    this.props.listenToPosts(extractId(this.props.events));
+    this.props.listenToNotes(extractId(this.props.events));
     this.fetchParticipants(extractParticipantIds(this.props.events.event));
   };
 
   newComment = commentData =>
-    this.props.addComment(commentData).then(this.props.getPosts(extractId(this.props.events)));
+    this.props.addComment(commentData)
+      .then(this.props.getPosts(commentData));
 
   newPost = postData =>
-    this.props.addPost(postData).then(this.props.getPosts(extractId(this.props.events)));
+    this.props.addPost(postData)
+      .then(this.props.getPosts(postData));
 
   toggleLike = postData =>
-    this.props.toggleLike(postData).then(this.props.getPosts(extractId(this.props.events)));
+    this.props.toggleLike(postData)
+      .then(this.props.getPosts(postData));
 
   /**
     * Fetch Data from API, saving to Redux
@@ -87,7 +94,7 @@ class EventView extends Component {
 
   render = () => {
     const {
-      Layout, location, events, event, locale, match, member, posts,
+      Layout, location, events, event, locale, match, member, posts, notes,
     } = this.props;
     const id = (match && match.params && match.params.id) ? match.params.id : null;
     return (
@@ -97,6 +104,7 @@ class EventView extends Component {
         eventId={Number(id)}
         locale={locale}
         posts={(posts.length && posts) || event.posts}
+        notes={(notes.length && notes) || event.notes}
         error={event.error}
         loading={event.loading}
         loadingData={event.loadingData}
@@ -120,10 +128,12 @@ const mapStateToProps = state => ({
   event: state.event || {},
   member: state.member || {},
   posts: state.event.posts || {},
+  notes: state.event.notes || {},
 });
 
 const mapDispatchToProps = {
-  listenToEvent,
+  listenToPosts,
+  listenToNotes,
   toggleLike,
   uploadFile,
   addComment,

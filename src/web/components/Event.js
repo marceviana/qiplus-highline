@@ -12,13 +12,13 @@ import {
   CardImg,
   CardTitle,
 } from 'reactstrap';
-import { Link } from 'react-router-dom';
 import ErrorMessages from '../../constants/errors';
 import Loading from './Loading';
 import Error from './Error';
 import Comments from './Comments';
 import PostNew from './PostNew';
 import EventNavBar from './EventNavBar';
+import Timer from './Timer';
 
 const EventView = (props) => {
   const {
@@ -55,16 +55,18 @@ const EventView = (props) => {
   // event not found
   if (!event) return <Error content={ErrorMessages.event404} />;
 
-  const isPit = location.pathname.indexOf('notes') >= 0;
+  const isPitch = location.pathname.indexOf('notes') >= 0;
 
-  const timeline = (!isPit && ((posts.length && posts) || event.posts)) || event.notes;
+  const timeline = (!isPitch && (
+    (posts.length && posts) || event.posts
+  )) || ((notes.length && notes) || event.notes);
 
   const Avatar = ({ user, style }) => {
-    if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>
+    if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>;
     return (
       <div style={style} className="avatar-img">
         { 
-          !!wpUsers[user] && wpUsers[user].avatar && 
+          !!wpUsers[user] && wpUsers[user].avatar &&
           <img alt="" src={wpUsers[user].avatar} />
         }
       </div>
@@ -77,6 +79,7 @@ const EventView = (props) => {
       content,
       eventId,
       postId: post.id,
+      postType: (isPitch ? 'notes' : 'post'),
     });
   };
 
@@ -85,6 +88,7 @@ const EventView = (props) => {
       user: currentUser,
       eventId,
       postId: post.id,
+      postType: (isPitch ? 'notes' : 'post'),
     });
   };
 
@@ -172,26 +176,26 @@ const EventView = (props) => {
       )}
       <CardBody style={styles.cardBody}>
         <Badge style={styles.dateTime}>{dateFormat(post.datetime)}</Badge>
-        <Avatar style={styles.avatar} user={post.user}/>
+        <Avatar style={styles.avatar} user={post.user} />
         <CardTitle style={styles.userName}>{post.username}</CardTitle>
         <CardText style={{ fontSize: 13 }}>
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <span dangerouslySetInnerHTML={{ __html: post.content }} />
         </CardText>
-        {(isPit && post.action_link && (
+        {(isPitch && post.action_link && (
           <CardFooter style={{ fontSize: 13 }}>
-            <a href="post.action_link">{post.action_link}</a>
+            <Timer href={post.action_link} deadline={post.deadline} />
           </CardFooter>
         )) || null
         }
       </CardBody>
       <Comments
-        wpUsers={wpUsers} 
+        wpUsers={wpUsers}
         commentId={commentId.toString()}
-        currentUser={currentUser} 
-        post={post} 
-        onSubmit={newComment} 
-        onLike={toggleLike} 
-        {...props} 
+        currentUser={currentUser}
+        post={post}
+        onSubmit={newComment}
+        onLike={toggleLike}
+        {...props}
       />
     </Card>
   ));
@@ -209,7 +213,7 @@ const EventView = (props) => {
               <CardTitle>{event.title}</CardTitle>
               <CardText>{event.description}</CardText>
             </CardBody>
-            { (!isPit && (
+            { (!isPitch && (
               <CardFooter style={{ fontSize: 13 }}>
                 <PostNew
                   user={currentUser}
