@@ -1,5 +1,6 @@
 
-const APP_ID = 'br-com-qiplus';
+export const APP_ID = 'br-com-qiplus';
+export const FCS_UPLOAD = 'https://us-central1-br-com-qiplus.cloudfunctions.net/upload';
 
 export default {
   apiKey: 'AIzaSyAKrHqfH_gV3gOqYQx9eZm9v3YqDggLW9o',

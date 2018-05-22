@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
-import { StyleSheet, View } from 'react-native';
-import { Text, Form, Item, CardItem, Button, Body, Textarea, Image, Left, Input, Icon } from 'native-base';
+import { Permissions, ImagePicker } from 'expo';
+import { View } from 'react-native';
+import { Text, Form, Button, Textarea } from 'native-base';
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import { Media } from './Event';
 
+import { Media } from './Event';
 import { translate } from '../../i18n';
 
 class PostNew extends React.Component {
@@ -28,6 +28,12 @@ class PostNew extends React.Component {
     uploadFn: PropTypes.func.isRequired,
     user: PropTypes.number.isRequired,
     eventId: PropTypes.number.isRequired,
+    upload: PropTypes.shape({
+      uploading: PropTypes.bool,
+      metadata: PropTypes.shape(),
+      progress: PropTypes.number,
+      error: PropTypes.string,
+    }),
   }
 
   static defaultProps = {
@@ -43,11 +49,15 @@ class PostNew extends React.Component {
     },
     initialState: {
       content: '',
-      downloadURL: '',
-      metadata: {},
+      localURI: '',
       hasFocus: false,
       showComments: false,
+    },
+    upload: {
+      uploading: false,
+      metadata: {},
       progress: 0,
+      error: '',
     },
   }
 
@@ -58,6 +68,8 @@ class PostNew extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
     this.handleFile = this.handleFile.bind(this);
+    this._send = this._send.bind(this);
+    this._pickImage = this._pickImage.bind(this);
   }
 
   handleChange = (name, val) => {
@@ -72,52 +84,28 @@ class PostNew extends React.Component {
       hasFocus: !!val,
     });
   }
-  handleFile = (e) => {
-    // const file = e.target.files[0];
-    // const { user, eventId } = this.props;
-    // const path = 'events';
+  handleFile = (uri) => {
+    const file = uri;
+    const { user, eventId } = this.props;
+    const path = 'events';
 
-    // this.props.uploadFn({
-    //   eventId, path, file, user,
-    // }, (result) => {
-    //   if (result.progress) {
-    //     this.setState({
-    //       ...this.state,
-    //       progress: result.progress,
-    //     });
-    //     return;
-    //   }
-
-    //   if (result.downloadURL) {
-    //     const { metadata, downloadURL } = result;
-    //     this.setState({
-    //       ...this.state,
-    //       progress: 0,
-    //       downloadURL,
-    //       metadata,
-    //     });
-    //     return;
-    //   }
-
-    //   if (result.error) {
-    //     this.setState({
-    //       ...this.state,
-    //       progress: 0,
-    //       downloadURL: '',
-    //       metadata: {},
-    //     });
-    //   }
-    // });
+    this.props.uploadFn({
+      eventId, path, file, user,
+    });
   }
 
-  send = () => {
-    const { onSubmit, post, user } = this.props;
-    const { content, downloadURL, metadata } = this.state;
+  _send = () => {
+    const {
+      onSubmit, post, user, upload,
+    } = this.props;
 
-    if (!content && !downloadURL) return;
+    const { content } = this.state;
+    const { metadata } = upload;
+
+    if (!content && (!metadata || !metadata.downloadURL)) return;
 
     const type = (metadata && metadata.contentType) || '';
-    const src = downloadURL || '';
+    const src = metadata.downloadURL || '';
 
     onSubmit({
       ...post,
@@ -132,46 +120,75 @@ class PostNew extends React.Component {
     }, 100);
   }
 
+  _pickImage = async () => {
+    const res = await Promise.all([
+      Permissions.askAsync(Permissions.CAMERA),
+      Permissions.askAsync(Permissions.CAMERA_ROLL),
+    ]);
+
+    if (res.some(({ status }) => status === 'granted')) {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+      });
+
+      const { cancelled, uri } = result;
+
+      if (!cancelled) {
+        this.setState({
+          ...this.state,
+          localURI: uri,
+        });
+        this.handleFile(uri);
+      }
+    }
+  }
+
   render() {
     const {
-      content, hasFocus, downloadURL, progress, metadata,
+      content, hasFocus, localURI,
     } = this.state;
 
-    const rows = hasFocus || content ? 4 : 1;
+    const {
+      progress, upload,
+    } = this.props;
+
+    const { metadata } = upload;
+    
+    const rows = hasFocus || content ? 5 : 2;
 
     return (
-      <Form style={{ marginTop: 15 }}>
-        <Media media={[{ src: downloadURL, type: metadata.contentType }]} />
-        <View className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>
-        <View style={{ flex: 1 }}>
-          <Button style={{ flex: 1, backgroundColor: (hasFocus || content ? '#ee1d67' : '#b5b5b5') }}>
-            <SimpleLineIcon style={{ color: '#fff' }} name="picture" />            
-          </Button>
-          <Button style={{ flex: 1, backgroundColor: (hasFocus || content ? '#ee1d67' : '#b5b5b5') }}>
-            <SimpleLineIcon style={{ color: '#fff' }} name="camera" />            
+      <Form style={{ flex: 1 }}>
+        <Media style={{ flex: 1 }} media={[{ src: localURI, type: metadata.contentType }]} />
+        <View style={{ flex: 1 }} className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ flex: 1 }}>
+            <Button block onPress={() => this._pickImage()} style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }}>
+              <SimpleLineIcon style={{ fontSize: 18, color: '#fff' }} name="picture" />
+            </Button>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button block style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }}>
+              <SimpleLineIcon style={{ fontSize: 18, color: '#fff' }} name="camera" />
+            </Button>
+          </View>
+        </View>
+        <View style={{ flex: 1, marginTop: 15 }}>
+          <Textarea
+            type="textarea"
+            name="content"
+            rowSpan={rows}
+            placeholder={translate('post_placeholder')}
+            value={content}
+            onChangeText={v => this.handleChange('content', v)}
+            onFocus={() => this.handleFocus(true)}
+            onBlur={() => this.handleFocus(false)}
+            style={{ flex: 1, borderRadius: 3 }}
+            bordered
+          />
+          <Button block style={{ flex: 1, justifyContent: 'center', backgroundColor: '#ee1d67' }} onPress={() => this._send()}>
+            <SimpleLineIcon style={{ fontSize: 18, color: '#fff' }} name="paper-plane" />
           </Button>
         </View>
-        <CardItem>
-          <View>
-            <View style={{ marginTop: 15 }}>
-              <Textarea
-                type="textarea"
-                name="content"
-                rowSpan={rows}
-                placeholder={translate('post_placeholder')}
-                value={content}
-                onChangeText={v => this.handleChange('content', v)}
-                onFocus={() => this.handleFocus(true)}
-                onBlur={() => this.handleFocus(false)}
-                style={{ flex: 1, borderRadius: 3 }}
-                bordered
-              />
-              <Button className={hasFocus || content ? 'bg-qi' : ''} onPress={() => this.send()}>
-                <SimpleLineIcon name="paper-plane" />
-              </Button>
-            </View>
-          </View>
-        </CardItem>
       </Form>
     );
   }

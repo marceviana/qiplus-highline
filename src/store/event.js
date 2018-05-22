@@ -2,6 +2,12 @@ export default {
   loading: true,
   loader: false,
   error: null,
+  upload: {
+    uploading: false,
+    metadata: {},
+    progress: 100,
+    error: '',
+  },
   posts: [],
   notes: [],
   wpUsers: {

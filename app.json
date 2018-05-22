@@ -2,8 +2,16 @@
   "expo": {
     "sdkVersion": "26.0.0",
     "name": "Live QI Plus",
-    "slug": "qi-plus-live",
+    "slug": "live-qiplus",
     "icon": "src/images/app-icon.png",
     "privacy": "public"
+  },
+  "android": {
+    "permissions": [
+      "CAMERA",
+      "READ_INTERNAL_STORAGE",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE"
+    ]
   }
 }

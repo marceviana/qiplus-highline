@@ -3,6 +3,8 @@ import Store from '../store/event';
 export const initialState = Store;
 
 export default function eventSingleReducer(state = initialState, action) {
+  console.log(action.type);
+  console.log(action);
   switch (action.type) {
     case 'EVENT_ERROR': {
       return {
@@ -31,11 +33,51 @@ export default function eventSingleReducer(state = initialState, action) {
         loadingData: true,
       };
     }
+    case 'POSTS_POSTED': {
+      return {
+        ...state,
+        upload: {
+          ...state.upload,
+          uploading: false,
+          metadata: {},
+        },
+      };
+    }
     case 'POSTS_ERROR': {
       return {
         ...state,
         loadingData: false,
         error: action.data,
+      };
+    }
+    case 'MEDIA_UPLOAD_END': {
+      return {
+        ...state,
+        upload: {
+          ...state.upload,
+          uploading: false,
+          metadata: action.data,
+        },
+      };
+    }
+    case 'MEDIA_UPLOAD_PROGRESS': {
+      return {
+        ...state,
+        upload: {
+          ...state.upload,
+          uploading: true,
+          progress: action.data,
+        },
+      };
+    }
+    case 'MEDIA_UPLOAD_ERROR': {
+      return {
+        ...state,
+        upload: {
+          ...state.upload,
+          uploading: false,
+          error: action.data,
+        },
       };
     }
     case 'WP_USERS_FETCHING': {

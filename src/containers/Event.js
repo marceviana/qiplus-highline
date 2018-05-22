@@ -31,6 +31,12 @@ class EventView extends Component {
     match: PropTypes.shape({
       params: PropTypes.shape({}),
     }),
+    upload: PropTypes.shape({
+      uploading: PropTypes.bool,
+      metadata: PropTypes.shape(),
+      progress: PropTypes.number,
+      error: PropTypes.string,
+    }),
     member: PropTypes.shape().isRequired,
     posts: PropTypes.arrayOf(PropTypes.shape()),
     notes: PropTypes.arrayOf(PropTypes.shape()),
@@ -53,6 +59,12 @@ class EventView extends Component {
     posts: [],
     notes: [],
     location: {},
+    upload: {
+      uploading: false,
+      metadata: {},
+      progress: 100,
+      error: '',
+    },
   }
 
   componentDidMount = () => {
@@ -95,13 +107,14 @@ class EventView extends Component {
 
   render = () => {
     const {
-      Layout, location, events, event, locale, match, member, posts, notes,
+      Layout, location, events, event, locale, match, member, posts, notes, upload,
     } = this.props;
     const id = (match && match.params && match.params.id) ? match.params.id : null;
     return (
       <Layout
         location={location || { pathname: (match && match.params && match.params.url) || '/' }}
         events={events.events}
+        upload={upload}
         eventId={Number(id)}
         locale={locale}
         posts={(posts.length && posts) || event.posts}
@@ -130,6 +143,7 @@ const mapStateToProps = state => ({
   member: state.member || {},
   posts: state.event.posts || {},
   notes: state.event.notes || {},
+  upload: state.event.upload || {},
 });
 
 const mapDispatchToProps = {

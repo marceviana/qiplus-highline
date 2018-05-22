@@ -1,5 +1,7 @@
 import moment from 'moment';
-import { Firebase, FirebaseRef, ImagesRef } from '../lib/firebase';
+import { Firebase, FirebaseRef, ImagesRef, StorageUpload } from '../lib/firebase';
+import { FCS_UPLOAD } from '../constants/firebase';
+
 
 /**
   * Set an Error Message
@@ -122,10 +124,12 @@ export function addComment(commentData) {
 
 export function addPost(postData) {
   const {
-    content, eventId, postType,
+    content, eventId, postType, downloadURL,
   } = postData;
 
-  if (!content || !eventId || Firebase === null) return () => new Promise(resolve => resolve());
+  if ((!content && !downloadURL) || !eventId || Firebase === null) {
+    return () => new Promise(resolve => resolve());
+  }
 
   return dispatch => new Promise((resolve, reject) => {
     const childType = postType === 'notes' ? postType : 'posts';
@@ -155,6 +159,10 @@ export function addPost(postData) {
     };
 
     lastRef.once('child_added', addToNextKey, failureCallback);
+
+    dispatch({
+      type: 'POSTS_POSTED',
+    });
 
     resolve(dispatch({
       type: 'POSTS_FETCHING',
@@ -247,7 +255,7 @@ export function getParticipants(participantIds) {
     })).catch(e => console.log(e));
 }
 
-export function uploadFile(data, callback) {
+export function uploadFile(data) {
   const {
     eventId, path, file, user,
   } = data;
@@ -258,16 +266,60 @@ export function uploadFile(data, callback) {
     },
   };
 
-  const fileName = file.name;
-  const uploadTask = ImagesRef.child(`${path}/${eventId}/${fileName}`).put(file, metaData);
+  return dispatch => new Promise((resolve) => {
+    if (typeof file === 'string') {
+      const uri = file;
+      const fileName = uri.split('/').pop();
 
-  uploadTask.on('state_changed', (snapshot) => {
-    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    callback({ progress });
-  }, (error) => {
-    callback({ error });
-  }, () => {
-    const { downloadURL, metadata } = uploadTask.snapshot;
-    callback({ downloadURL, metadata });
+      const uploadPath = `${path}/${eventId}/`;
+
+      // const token = await auth.currentUser.getIdToken(true); // true = forceRefresh
+      const mediaUpload = async () => {
+        const metadata = await StorageUpload({
+          uri,
+          fileName, // file name
+          endpoint: FCS_UPLOAD,
+          ImagesRef, // firebase.storage() ref.
+          uploadPath, // will store in `img` folder, defaults to root directory `/`
+          // token // pass the token if your endpoint requires authentication
+        });
+
+        console.log({
+          metadata,
+          downloadURL: metadata.downloadURLs[0],
+          storageLocation: `gs://${metadata.bucket}/${metadata.fullPath}`,
+        });
+
+        const downloadURL = metadata.downloadURLs[0];
+
+        return resolve(dispatch({
+          type: 'MEDIA_UPLOAD_END',
+          data: { downloadURL, metadata },
+        }));
+      };
+      return mediaUpload();
+    }
+
+    const fileName = file.name;
+    const uploadTask = ImagesRef.child(`${path}/${eventId}/${fileName}`).put(file, metaData);
+
+    return uploadTask.on('state_changed', (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      resolve(dispatch({
+        type: 'MEDIA_UPLOAD_PROGRESS',
+        data: progress,
+      }));
+    }, (error) => {
+      resolve(dispatch({
+        type: 'MEDIA_UPLOAD_ERROR',
+        data: error,
+      }));
+    }, () => {
+      const { downloadURL, metadata } = uploadTask.snapshot;
+      resolve(dispatch({
+        type: 'MEDIA_UPLOAD_END',
+        data: { downloadURL, metadata },
+      }));
+    });
   });
 }

@@ -34,6 +34,7 @@ const EventView = (props) => {
     currentUser,
     error,
     loading,
+    upload,
     events,
     eventId,
     commentId,
@@ -221,6 +222,7 @@ const EventView = (props) => {
             { (!isPitch && (
               <CardFooter style={{ fontSize: 13 }}>
                 <PostNew
+                  upload={upload}
                   user={currentUser}
                   eventId={eventId}
                   onSubmit={newPost}
@@ -264,6 +266,7 @@ EventView.propTypes = {
   location: PropTypes.shape(),
   participants: PropTypes.shape(),
   wpUsers: PropTypes.shape(),
+  upload: PropTypes.shape(),
   currentUser: PropTypes.number,
 };
 
@@ -273,6 +276,7 @@ EventView.defaultProps = {
   locale: null,
   error: null,
   location: {},
+  upload: {},
   participants: {},
   posts: [],
   notes: [],

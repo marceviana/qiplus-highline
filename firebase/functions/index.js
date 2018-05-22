@@ -11,8 +11,16 @@ const upload = require('react-native-firebase-upload');
 
 admin.initializeApp(functions.config().firebase);
 
+// --------------------------------------------------------------
+// upload
+// --------------------------------------------------------------
+// without authentication
+exports.upload = functions.https.onRequest(upload.handler);
+
 // with authentication
-exports.upload = functions.https.onRequest(upload.authHandler);
+// exports.upload = functions.https.onRequest(upload.authHandler);
+// --------------------------------------------------------------
+
 
 /**
   * Listens for updates to /users/:userId and creates an

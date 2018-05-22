@@ -8,6 +8,7 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { Video } from 'expo';
 import { FlatList, RefreshControl, Image, StyleSheet, View } from 'react-native';
 import { Container, Content, Card, CardItem, Body, H3, Text, Spinner, Left, Thumbnail } from 'native-base';
+import Colors from '../../../native-base-theme/variables/commonColor';
 import ErrorMessages from '../../constants/errors';
 import Loading from './Loading';
 import Error from './Error';
@@ -24,6 +25,8 @@ const styles = StyleSheet.create({
     fontWeight: '100',
     fontSize: 10,
     borderRadius: 5,
+    backgroundColor: Colors.brandPrimary,
+    color: '#fff',
   },
   userName: {
     position: 'relative',
@@ -34,7 +37,6 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   avatarThumbnail: {
-    borderRadius: 72,
     width: 72,
     height: 72,
   },
@@ -43,7 +45,7 @@ const styles = StyleSheet.create({
     left: 10,
     top: 5,
     backgroundColor: '#fff',
-    borderRadius: 72,
+    borderRadius: 100,
     width: 72,
     height: 72,
     borderColor: '#ededed',
@@ -55,27 +57,31 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingTop: 30,
   },
+  mediaWrapper: {
+    flex: 1,
+  },
 });
 
-export const Media = media => (media && media[0] && media[0].src && (
-  media[0].type && media[0].type.indexOf('vid') >= 0 ?
-    <Video
-      source={{ uri: media[0].src }}
-      shouldPlay
-      resizeMode="cover"
-      style={{ flex: 1, height: 300 }}
-    />
-    :
-    <Left>
-      <Image source={{ uri: media[0].src }} />
-    </Left>
-)) || <Text>{' '}</Text>;
+export const Media = ({ media }) => (
+  (media && media[0] && media[0].src && (
+    media[0].type && media[0].type.indexOf('vid') >= 0 ?
+      <Video
+        source={{ uri: media[0].src }}
+        shouldPlay
+        resizeMode="cover"
+        style={{ flex: 1, height: 300 }}
+      />
+      :
+      <Image source={{ uri: media[0].src }} style={{ height: 250, width: null, flex: 1 }} />
+  )) || <Text>{' '}</Text>
+);
 
 const EventView = (props) => {
   const {
     locale,
     location,
     currentUser,
+    upload,
     error,
     loading,
     events,
@@ -194,6 +200,7 @@ const EventView = (props) => {
           </CardItem>
           <CardItem>
             <PostNew
+              upload={upload}
               user={currentUser}
               eventId={eventId}
               onSubmit={newPost}
@@ -205,15 +212,20 @@ const EventView = (props) => {
 
         <Spacer size={20} />
 
-        {!!loading && <Spinner color="blue" />}
+        {!!loading && <Spinner color={Colors.brandPrimary} />}
 
         {!!timeline && !!timeline.length && <FlatList
           numColumns={1}
           data={timeline.slice(0).reverse()}
-          renderItem={({ item, index }) => (
+          renderItem={({ item, index }) => {
+            const hasMedia = item.media && item.media[0] && item.media[0].src;
+            const cardStyle = hasMedia ? { ...styles.cardWrapper, borderRadius: 0 } : styles.cardWrapper ;
+            return (
             !!item.username && index < loaded &&
-            <View style={ styles.cardWrapper }>
-              <Media media={item.media} />
+            <View style={cardStyle}>
+              <View style={styles.mediaWrapper}>
+                <Media media={item.media} />
+              </View>
               <Avatar style={styles.avatar} user={item.user} />
               <Card transparent style={{ position: 'relative', paddingHorizontal: 6, zIndex: 0 }}>
                 <CardItem>
@@ -242,7 +254,7 @@ const EventView = (props) => {
                 />
               </Card>
             </View>
-          )}
+          )}}
           keyExtractor={keyExtractor}
           onEndReached={loadMore}
           onEndReachedThreshold={1}
@@ -256,6 +268,7 @@ const EventView = (props) => {
 };
 
 EventView.propTypes = {
+  upload: PropTypes.shape(),
   locale: PropTypes.string,
   location: PropTypes.shape(),
   error: PropTypes.string,
@@ -284,6 +297,7 @@ EventView.defaultProps = {
   posts: [],
   notes: [],
   wpUsers: {},
+  upload: {},
 };
 
 export default EventView;

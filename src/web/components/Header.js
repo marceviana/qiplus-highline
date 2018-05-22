@@ -5,15 +5,10 @@ import {
   Navbar,
   Collapse,
   NavItem,
-  DropdownMenu,
-  DropdownItem,
   NavbarToggler,
-  DropdownToggle,
-  UncontrolledDropdown,
 } from 'reactstrap';
 import { Link, withRouter } from 'react-router-dom';
 import Config from '../../constants/config';
-import { SidebarNavItems } from './Sidebar';
 
 class Header extends Component {
   static propTypes = {
@@ -57,7 +52,6 @@ class Header extends Component {
       <header>
         <Navbar dark color="primary" expand="sm" className="fixed-top">
           <Link to="/" className="navbar-brand" style={{ color: '#FFF' }}>
-            <span className="logo"></span>
             <span>{Config.appName}</span>
           </Link>
           <NavbarToggler onClick={this.toggleDropDown} />
@@ -75,7 +69,7 @@ class Header extends Component {
                   </Link>
                 </NavItem>
                 <NavItem>
-                  {loggedIn ? 
+                  {loggedIn ?
                     <Link onClick={this.toggleDropDown} className={`nav-link ${this.getLocation() === '/login' && 'active'}`} to="/login">
                       <i className="icon-login" /> <span>Login</span>
                     </Link> :
