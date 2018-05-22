@@ -36,92 +36,101 @@ import AboutComponent from '../components/About';
 const Index = (
   <Stack>
     <Scene hideNavBar>
-      <Tabs
-        key="tabbar"
-        swipeEnabled
-        type="replace"
-        tabBarPosition="bottom"
-        showLabel={false}
-        {...DefaultProps.tabProps}
+      <Stack
+        key="home"
+        title={AppConfig.appName.toUpperCase()}
+        icon={() => <Icon name="planet" {...DefaultProps.icons} />}
+        {...DefaultProps.navbarProps}
       >
-        <Stack
-          key="home"
-          title={AppConfig.appName.toUpperCase()}
-          icon={() => <Icon name="planet" {...DefaultProps.icons} />}
-          {...DefaultProps.navbarProps}
-        >
-          <Scene key="home" component={AboutComponent} />
-        </Stack>
+        <Scene key="home" component={AboutComponent} />
+      </Stack>
 
-        <Stack
-          key="events"
-          title={translate('events', locale)}
-          icon={() => <Icon name="albums" {...DefaultProps.icons} />}
-          {...DefaultProps.navbarProps}
-        >
-          <Scene key="events" component={EventsContainer} Layout={EventsComponent} />
-        </Stack>
+      <Stack
+        key="events"
+        title={translate('events', locale)}
+        icon={() => <Icon name="albums" {...DefaultProps.icons} />}
+        {...DefaultProps.navbarProps}
+      >
+        <Scene key="events" component={EventsContainer} Layout={EventsComponent} />
+      </Stack>
 
-        <Stack
-          key="profile"
-          title={translate('profile', locale)}
-          icon={() => <Icon name="contact" {...DefaultProps.icons} />}
+      <Stack
+        key="profile"
+        title={translate('profile', locale)}
+        icon={() => <Icon name="contact" {...DefaultProps.icons} />}
+        {...DefaultProps.navbarProps}
+      >
+        <Scene key="profileHome" component={MemberContainer} Layout={ProfileComponent} />
+        <Scene
+          back
+          key="signUp"
+          title={translate('signUp', locale)}
           {...DefaultProps.navbarProps}
-        >
-          <Scene key="profileHome" component={MemberContainer} Layout={ProfileComponent} />
-          <Scene
-            back
-            key="signUp"
-            title={translate('signUp', locale)}
-            {...DefaultProps.navbarProps}
-            component={SignUpContainer}
-            Layout={SignUpComponent}
-          />
-          <Scene
-            back
-            key="login"
-            title={translate('login', locale)}
-            {...DefaultProps.navbarProps}
-            component={LoginContainer}
-            Layout={LoginComponent}
-          />
-          <Scene
-            back
-            key="forgotPassword"
-            title={translate('forgotPassword', locale)}
-            {...DefaultProps.navbarProps}
-            component={ForgotPasswordContainer}
-            Layout={ForgotPasswordComponent}
-          />
-          <Scene
-            back
-            key="locale"
-            title={translate('locale', locale)}
-            {...DefaultProps.navbarProps}
-            component={LocaleContainer}
-            Layout={LocaleComponent}
-          />
-          <Scene
-            back
-            key="updateProfile"
-            title={translate('updateProfile', locale)}
-            {...DefaultProps.navbarProps}
-            component={UpdateProfileContainer}
-            Layout={UpdateProfileComponent}
-          />
-        </Stack>
-      </Tabs>
+          component={SignUpContainer}
+          Layout={SignUpComponent}
+        />
+        <Scene
+          back
+          key="login"
+          title={translate('login', locale)}
+          {...DefaultProps.navbarProps}
+          component={LoginContainer}
+          Layout={LoginComponent}
+        />
+        <Scene
+          back
+          key="forgotPassword"
+          title={translate('forgotPassword', locale)}
+          {...DefaultProps.navbarProps}
+          component={ForgotPasswordContainer}
+          Layout={ForgotPasswordComponent}
+        />
+        <Scene
+          back
+          key="locale"
+          title={translate('locale', locale)}
+          {...DefaultProps.navbarProps}
+          component={LocaleContainer}
+          Layout={LocaleComponent}
+        />
+        <Scene
+          back
+          key="updateProfile"
+          title={translate('updateProfile', locale)}
+          {...DefaultProps.navbarProps}
+          component={UpdateProfileContainer}
+          Layout={UpdateProfileComponent}
+        />
+      </Stack>
     </Scene>
 
-    <Scene
-      back
-      clone
-      key="event"
-      title={translate('event', locale)}
-      {...DefaultProps.navbarProps}
-      component={EventContainer}
-      Layout={EventViewComponent}
-    />
+    <Tabs
+      key="tabbar"
+      swipeEnabled
+      type="replace"
+      tabBarPosition="bottom"
+      showLabel={false}
+      {...DefaultProps.tabProps}
+    >
+      <Scene
+        back
+        clone
+        key="event"
+        title={translate('event', locale)}
+        {...DefaultProps.navbarProps}
+        component={EventContainer}
+        Layout={EventViewComponent}
+      />
+      <Scene
+        back
+        clone
+        key="notes"
+        title={translate('event', locale)}
+        {...DefaultProps.navbarProps}
+        component={EventContainer}
+        Layout={EventViewComponent}
+      />
+    </Tabs>
   </Stack>
 );
 

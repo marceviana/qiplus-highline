@@ -14,6 +14,7 @@ import Error from './Error';
 import Spacer from './Spacer';
 import Comments from './Comments';
 import PostNew from './PostNew';
+import Timer from './Timer';
 
 const styles = StyleSheet.create({
   dateTime: {
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const Media = ( media ) => (media && media[0] && media[0].src && (
+export const Media = media => (media && media[0] && media[0].src && (
   media[0].type && media[0].type.indexOf('vid') >= 0 ?
     <Video
       source={{ uri: media[0].src }}
@@ -73,6 +74,7 @@ export const Media = ( media ) => (media && media[0] && media[0].src && (
 const EventView = (props) => {
   const {
     locale,
+    location,
     currentUser,
     error,
     loading,
@@ -86,6 +88,7 @@ const EventView = (props) => {
     participants,
     wpUsers,
     posts,
+    notes,
     reFetch,
     reFetchUsers,
   } = props;
@@ -105,6 +108,12 @@ const EventView = (props) => {
   // event not found
   if (!event) return <Error content={ErrorMessages.event404} />;
 
+  const isPitch = location.pathname && location.pathname.indexOf('notes') >= 0;
+
+  const timeline = (!isPitch && (
+    (posts.length && posts) || event.posts
+  )) || ((notes.length && notes) || event.notes);
+
   const Avatar = ({ user, style }) => {
     if (!wpUsers[user] || !wpUsers[user].avatar) return <View style={style}><FontAwesomeIcon style={styles.avatarIcon} size={50} name="user-circle-o" /></View>;
     return (
@@ -117,12 +126,21 @@ const EventView = (props) => {
     );
   };
 
+  const ActionLink = ({ action_link, deadline }) => (
+    isPitch && action_link &&
+    (!deadline || new Date(deadline).getTime() < new Date().getTime()) && (
+      <View style={{ fontSize: 13 }}>
+        <Timer href={action_link} deadline={deadline} />
+      </View>
+    )) || null;
+
   const newComment = (post, content) => {
     addComment({
       user: currentUser,
       content,
       eventId,
       postId: post.id,
+      postType: (isPitch ? 'notes' : 'post'),
     });
   };
 
@@ -131,6 +149,7 @@ const EventView = (props) => {
       user: currentUser,
       eventId,
       postId: post.id,
+      postType: (isPitch ? 'notes' : 'post'),
     });
   };
 
@@ -156,8 +175,6 @@ const EventView = (props) => {
   const loadMore = () => {
     loaded += 10;
   };
-
-  const timeline = (posts.length && posts) || event.posts;
 
   return (
     <Container>
@@ -210,6 +227,7 @@ const EventView = (props) => {
                     <Spacer size={10} />
                     <Text>{item.content}</Text>
                     <Spacer size={15} />
+                    <ActionLink post={item} />
                   </Body>
                 </CardItem>
                 <Comments
@@ -219,6 +237,7 @@ const EventView = (props) => {
                   post={item}
                   onSubmit={newComment}
                   onLike={toggleLike}
+                  dateFormatter={dateFormatter}
                   {...props}
                 />
               </Card>
@@ -238,11 +257,13 @@ const EventView = (props) => {
 
 EventView.propTypes = {
   locale: PropTypes.string,
+  location: PropTypes.shape(),
   error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
+  notes: PropTypes.arrayOf(PropTypes.shape()),
   commentId: PropTypes.string,
   addComment: PropTypes.func.isRequired,
   addPost: PropTypes.func.isRequired,
@@ -258,8 +279,10 @@ EventView.defaultProps = {
   commentId: '1',
   locale: null,
   error: null,
+  location: {},
   participants: {},
   posts: [],
+  notes: [],
   wpUsers: {},
 };
 

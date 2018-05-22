@@ -47,6 +47,7 @@ class Comments extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     onLike: PropTypes.func.isRequired,
     currentUser: PropTypes.number.isRequired,
+    dateFormatter: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -114,7 +115,7 @@ class Comments extends React.Component {
 
   render() {
     const {
-      commentId, post, wpUsers, currentUser,
+      commentId, post, wpUsers, currentUser, dateFormatter,
     } = this.props;
 
     const {
@@ -129,7 +130,7 @@ class Comments extends React.Component {
             onPress={() => this.toggleLike()}
             style={styles.iconButton}
           >
-            <SimpleLineIcon size={20} name="like" style={{ color: (post.likes && post.likes.indexOf(currentUser) >= 0 ? '#ee1d67' : '') }} />
+            <SimpleLineIcon size={20} name="like" />
           </Button>
           <Counter primary count={post.likes} />
           <Button
@@ -151,6 +152,7 @@ class Comments extends React.Component {
               return (
                 <CardItem key={i}>
                   <Avatar style={{ flex: 0.25 }} user={user} wpUsers={wpUsers} />
+                  <Text style={styles.dateTime}>{dateFormatter(comment.datetime)}</Text>
                   <Body style={{ flex: 0.75 }}>
                     <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
                       {(!!wpUsers[user] && wpUsers[user].display_name) || ''}

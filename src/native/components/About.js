@@ -1,24 +1,30 @@
 import React from 'react';
-import { Container, Content, Text, H1, H2, H3, Button } from 'native-base';
+import { StyleSheet, View, Image } from 'react-native';
+import { Actions } from 'react-native-router-flux';
+import { Container, Content, Text, Icon, Button } from 'native-base';
 import Spacer from './Spacer';
 
+const styles = StyleSheet.create({
+  homeContainer: {
+    backgroundColor: '#fff',
+  },
+  homeWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+});
+
 const About = () => (
-  <Container>
-    <Content padder>
+  <Container style={styles.homeContainer}>
+    <Content>
+      <Image source={{ uri: 'http://qiplus.com.br/wp-content/uploads/recorte2.jpg' }} style={{ height: 400, width: null, flex: 1 }} />
       <Spacer size={30} />
-      <H1>Heading 1</H1>
-      <Spacer size={10} />
-      <Text>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </Text>
-
-      <Spacer size={30} />
-      <H2>Heading 2</H2>
-      <Spacer size={10} />
-      <Text>Elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </Text>
-
-      <Spacer size={30} />
-      <H3>Heading 3</H3>
-      <Spacer size={10} />
-      <Text>Elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </Text>
+      <View style={styles.homeWrapper}>
+        <Button onPress={() => Actions.events()} >
+          <Icon name="calendar" /> <Text>Ver meus eventos no Live QI Plus</Text>
+        </Button>
+      </View>
     </Content>
   </Container>
 );

@@ -13,7 +13,7 @@ const extractId = ({ eventId }) => eventId;
 class EventView extends Component {
   static propTypes = {
     locale: PropTypes.string,
-    location: PropTypes.shape().isRequired,
+    location: PropTypes.shape(),
     Layout: PropTypes.func.isRequired,
     events: PropTypes.shape({
       loading: PropTypes.bool.isRequired,
@@ -52,6 +52,7 @@ class EventView extends Component {
     match: null,
     posts: [],
     notes: [],
+    location: {},
   }
 
   componentDidMount = () => {
@@ -99,7 +100,7 @@ class EventView extends Component {
     const id = (match && match.params && match.params.id) ? match.params.id : null;
     return (
       <Layout
-        location={location}
+        location={location || { pathname: (match && match.params && match.params.url) || '/' }}
         events={events.events}
         eventId={Number(id)}
         locale={locale}

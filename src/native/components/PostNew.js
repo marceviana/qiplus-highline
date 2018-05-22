@@ -142,20 +142,13 @@ class PostNew extends React.Component {
     return (
       <Form style={{ marginTop: 15 }}>
         <Media media={[{ src: downloadURL, type: metadata.contentType }]} />
-        <View className="upload-progress"><Text style={{ width: `${progress}%` }} >{'-'}</Text></View>
-        <View>
-          <Button color={hasFocus || content ? '#ee1d67' : '#b5b5b5'}>
-            <SimpleLineIcon name="picture" />
-            <Input
-              type="file"
-              name="file"
-              onChange={this.handleFile}
-            />
-            {/* <Text>{translate('pick_file')}</Text> */}
+        <View className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>
+        <View style={{ flex: 1 }}>
+          <Button style={{ flex: 1, backgroundColor: (hasFocus || content ? '#ee1d67' : '#b5b5b5') }}>
+            <SimpleLineIcon style={{ color: '#fff' }} name="picture" />            
           </Button>
-          <Button color={hasFocus || content ? '#ee1d67' : '#b5b5b5'}>
-            <SimpleLineIcon name="camera" />
-            {/* <Text>{translate('start_camera')}</Text> */}
+          <Button style={{ flex: 1, backgroundColor: (hasFocus || content ? '#ee1d67' : '#b5b5b5') }}>
+            <SimpleLineIcon style={{ color: '#fff' }} name="camera" />            
           </Button>
         </View>
         <CardItem>
