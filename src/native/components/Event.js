@@ -5,9 +5,10 @@ import 'moment/locale/pt-br';
 
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
+import { Actions } from 'react-native-router-flux';
 import { Video } from 'expo';
 import { FlatList, RefreshControl, Image, StyleSheet, View } from 'react-native';
-import { Container, Content, Card, CardItem, Body, H3, Text, Spinner, Left, Thumbnail } from 'native-base';
+import { Container, Content, Footer, FooterTab, Card, CardItem, Body, H3, Text, Button, Icon, Spinner, Thumbnail } from 'native-base';
 import Colors from '../../../native-base-theme/variables/commonColor';
 import ErrorMessages from '../../constants/errors';
 import Loading from './Loading';
@@ -18,47 +19,95 @@ import PostNew from './PostNew';
 import Timer from './Timer';
 
 const styles = StyleSheet.create({
-  dateTime: {
+  pillWrapper: {
     position: 'absolute',
-    top: 3,
+    top: 32,
     right: 5,
+    borderRadius: 15,
+    backgroundColor: Colors.brandPrimary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    zIndex: 2,
+  },
+  dateTime: {
     fontWeight: '100',
     fontSize: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.brandPrimary,
     color: '#fff',
   },
   userName: {
     position: 'relative',
-    paddingLeft: 70,
+    paddingLeft: 85,
     top: 0,
-  },
-  avatarIcon: {
-    margin: 10,
-  },
-  avatarThumbnail: {
-    width: 72,
-    height: 72,
   },
   avatar: {
     position: 'absolute',
     left: 10,
-    top: 5,
+    top: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    zIndex: 2,
+    overflow: 'hidden',
+    borderRadius: 80,
+    width: 80,
+    height: 80,
     backgroundColor: '#fff',
-    borderRadius: 100,
-    width: 72,
-    height: 72,
-    borderColor: '#ededed',
-    borderWidth: 1,
+    justifyContent: 'center',
+  },
+  avatarIcon: {
+    color: '#3b3b3b',
+    margin: 10,
+  },
+  avatarThumbnail: {
+    position: 'absolute',
+    left: 10,
+    top: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    zIndex: 2,
+  },
+  container: {
+    position: 'relative',
     zIndex: 1,
   },
-  cardWrapper: {
+  card: {
+    backgroundColor: 'rgba(255,255,255,0)',
     position: 'relative',
-    marginTop: 20,
-    paddingTop: 30,
+    paddingTop: 40,
+    marginTop: -40,
+    zIndex: 1,
+    top: -3,
+  },
+  cardBody: {
+    padding: 15,
+    backgroundColor: '#fff',
+    borderBottomColor: '#ededed',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   mediaWrapper: {
+    position: 'relative',
     flex: 1,
+    zIndex: 0,
+  },
+  media: {
+    height: 250,
+    width: null,
+    flex: 1,
+  },
+  footerTab: {
+    backgroundColor: Colors.brandPrimary,
+  },
+  footerBtn: {
+    backgroundColor: Colors.brandPrimary,
+  },
+  footerText: {
+    color: '#fff',
+  },
+  footerIcon: {
+    color: '#fff',
   },
 });
 
@@ -69,10 +118,13 @@ export const Media = ({ media }) => (
         source={{ uri: media[0].src }}
         shouldPlay
         resizeMode="cover"
-        style={{ flex: 1, height: 300 }}
+        style={styles.media}
       />
       :
-      <Image source={{ uri: media[0].src }} style={{ height: 250, width: null, flex: 1 }} />
+      <Image
+        source={{ uri: media[0].src }}
+        style={styles.media}
+      />
   )) || <Text>{' '}</Text>
 );
 
@@ -84,19 +136,15 @@ const EventView = (props) => {
     upload,
     error,
     loading,
-    events,
+    event,
     eventId,
-    commentId,
     addComment,
     addPost,
     likeFn,
     uploadFn,
-    participants,
     wpUsers,
     posts,
     notes,
-    reFetch,
-    reFetchUsers,
   } = props;
 
   // Loading
@@ -105,14 +153,8 @@ const EventView = (props) => {
   // Error
   if (error) return <Error content={error} />;
 
-  // Get this event from all events
-  let event = null;
-  if (eventId && events) {
-    event = events.find(item => parseInt(item.id, 10) === parseInt(eventId, 10));
-  }
-
   // event not found
-  if (!event) return <Error content={ErrorMessages.event404} />;
+  if (!event || !event.id) return <Error content={ErrorMessages.event404} />;
 
   const isPitch = location.pathname && location.pathname.indexOf('notes') >= 0;
 
@@ -121,15 +163,19 @@ const EventView = (props) => {
   )) || ((notes.length && notes) || event.notes);
 
   const Avatar = ({ user, style }) => {
-    if (!wpUsers[user] || !wpUsers[user].avatar) return <View style={style}><FontAwesomeIcon style={styles.avatarIcon} size={50} name="user-circle-o" /></View>;
+    if (!wpUsers[user] || !wpUsers[user].avatar) return <View style={style}><FontAwesomeIcon style={styles.avatarIcon} size={60} name="user-circle-o" /></View>;
     return (
-      <View style={style}>
-        {
-          !!wpUsers[user] && wpUsers[user].avatar &&
-          <Thumbnail style={styles.avatarThumbnail} source={{ uri: wpUsers[user].avatar }} />
-        }
-      </View>
+      <Thumbnail large style={styles.avatarThumbnail} source={{ uri: wpUsers[user].avatar }} />
     );
+  };
+
+  Avatar.propTypes = {
+    user: PropTypes.number.isRequired,
+    style: PropTypes.any,
+  };
+
+  Avatar.defaultProps = {
+    style: {},
   };
 
   const ActionLink = ({ action_link, deadline }) => (
@@ -139,6 +185,16 @@ const EventView = (props) => {
         <Timer href={action_link} deadline={deadline} />
       </View>
     )) || null;
+
+  ActionLink.propTypes = {
+    action_link: PropTypes.string,
+    deadline: PropTypes.string,
+  };
+
+  ActionLink.defaultProps = {
+    action_link: '',
+    deadline: '',
+  };
 
   const newComment = (post, content) => {
     addComment({
@@ -185,33 +241,31 @@ const EventView = (props) => {
   return (
     <Container>
       <Content padder>
-        <Image source={{ uri: event.banner }} style={{ height: 250, width: null, flex: 1 }} />
+        <Image source={{ uri: event.banner }} style={{ height: 200, width: null, flex: 1 }} />
 
         <Spacer size={25} />
         <H3>{event.title}</H3>
         {!!event.organizers && event.organizers.length && <Text>{event.organizers.join(' & ')}</Text>}
-        <Spacer size={15} />
 
-        <Card>
-          <CardItem>
-            <Body>
-              <Text>{event.description}</Text>
-            </Body>
-          </CardItem>
-          <CardItem>
-            <PostNew
-              upload={upload}
-              user={currentUser}
-              eventId={eventId}
-              onSubmit={newPost}
-              uploadFn={uploadFn}
-              {...props}
-            />
-          </CardItem>
-        </Card>
+        <Spacer size={10} />
+        {!!event.description && <Text>{event.description}</Text>}
+
+        {(!isPitch && (
+          <Card>
+            <CardItem>
+              <PostNew
+                upload={upload}
+                user={currentUser}
+                eventId={eventId}
+                onSubmit={newPost}
+                uploadFn={uploadFn}
+                {...props}
+              />
+            </CardItem>
+          </Card>
+         )) || null}
 
         <Spacer size={20} />
-
         {!!loading && <Spinner color={Colors.brandPrimary} />}
 
         {!!timeline && !!timeline.length && <FlatList
@@ -219,23 +273,27 @@ const EventView = (props) => {
           data={timeline.slice(0).reverse()}
           renderItem={({ item, index }) => {
             const hasMedia = item.media && item.media[0] && item.media[0].src;
-            const cardStyle = hasMedia ? { ...styles.cardWrapper, borderRadius: 0 } : styles.cardWrapper ;
+            const containerStyle = hasMedia ?
+              { ...styles.container, borderRadius: 0 } :
+              styles.container;
             return (
             !!item.username && index < loaded &&
-            <View style={cardStyle}>
+            <View style={containerStyle}>
               <View style={styles.mediaWrapper}>
                 <Media media={item.media} />
               </View>
-              <Avatar style={styles.avatar} user={item.user} />
-              <Card transparent style={{ position: 'relative', paddingHorizontal: 6, zIndex: 0 }}>
-                <CardItem>
+              <Card transparent style={styles.card}>
+                <Avatar style={styles.avatar} user={Number(item.user)} />
+                <View style={styles.pillWrapper}>
                   <Text note style={styles.dateTime}>{dateFormatter(item.datetime)}</Text>
+                </View>
+                <CardItem>
                   <Body style={styles.userName}>
                     <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
                   </Body>
                 </CardItem>
-                <CardItem cardBody>
-                  <Body style={{ padding: 10 }}>
+                <CardItem cardBody style={styles.cardBody}>
+                  <Body>
                     <Spacer size={10} />
                     <Text>{item.content}</Text>
                     <Spacer size={15} />
@@ -244,7 +302,6 @@ const EventView = (props) => {
                 </CardItem>
                 <Comments
                   wpUsers={wpUsers}
-                  commentId={commentId.toString()}
                   currentUser={currentUser}
                   post={item}
                   onSubmit={newComment}
@@ -253,6 +310,7 @@ const EventView = (props) => {
                   {...props}
                 />
               </Card>
+              <Spacer size={60} />
             </View>
           )}}
           keyExtractor={keyExtractor}
@@ -263,6 +321,38 @@ const EventView = (props) => {
         <Spacer size={20} />
 
       </Content>
+
+      <Footer>
+        <FooterTab style={styles.footerTab}>
+          <Button
+            style={!isPitch ? {...styles.footerBtn, backgroundColor: Colors.tabActiveBgColor } : {...styles.footerBtn }}
+            onPress={() => Actions.event({ location: { pathname: `/event/${eventId}/notes` }, match: { params: { id: String(eventId) } } })}
+            vertical
+            active={!isPitch}
+          >
+            <Icon style={styles.footerIcon} name="apps" />
+            <Text style={styles.footerText}>Live Posts</Text>
+          </Button>
+          <Button
+            style={isPitch ? {...styles.footerBtn, backgroundColor: Colors.tabActiveBgColor } : {...styles.footerBtn }}
+            onPress={() => Actions.event({ location: { pathname: `/event/${eventId}/notes` }, match: { params: { id: String(eventId), url: 'notes' } } })}
+            vertical
+            active={isPitch}
+          >
+            <Icon style={styles.footerIcon} name="flame" />
+            <Text style={styles.footerText}>Hot Posts</Text>
+          </Button>
+          <Button
+            style={false ? {...styles.footerBtn, backgroundColor: Colors.tabActiveBgColor } : {...styles.footerBtn }}
+            onPress={() => Actions.event({ location: { pathname: `/event/${eventId}/notes` }, match: { params: { id: String(eventId) } } })}
+            vertical
+            active={false}
+          >
+            <Icon style={styles.footerIcon} name="contacts" />
+            <Text style={styles.footerText}>Participantes</Text>
+          </Button>
+        </FooterTab>
+      </Footer>  
     </Container>
   );
 };
@@ -274,26 +364,22 @@ EventView.propTypes = {
   error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
-  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  event: PropTypes.shape().isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
   notes: PropTypes.arrayOf(PropTypes.shape()),
-  commentId: PropTypes.string,
   addComment: PropTypes.func.isRequired,
   addPost: PropTypes.func.isRequired,
   likeFn: PropTypes.func.isRequired,
   uploadFn: PropTypes.func.isRequired,
-  participants: PropTypes.shape(),
   wpUsers: PropTypes.shape(),
   currentUser: PropTypes.number,
 };
 
 EventView.defaultProps = {
   currentUser: 1,
-  commentId: '1',
   locale: null,
   error: null,
   location: {},
-  participants: {},
   posts: [],
   notes: [],
   wpUsers: {},

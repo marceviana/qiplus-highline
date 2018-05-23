@@ -181,3 +181,9 @@ body {
   }
 }
 
+@media(max-width: 565px){
+  .header-banner{
+    position: fixed !important;
+    top: 3.4rem !important;
+  }
+}

@@ -24,16 +24,6 @@ export function setEventsError(message) {
 /**
   * Set an Error Message
   */
-export function showLoader() {
-  return {
-    type: 'EVENTS_LOADER',
-    data: '',
-  };
-}
-
-/**
-  * Set an Error Message
-  */
 export function eventSetter(id) {
   return {
     type: 'EVENTS_SETTER',

@@ -73,7 +73,6 @@ const Avatar = (props) => {
 
 class Comments extends React.Component {
   static propTypes = {
-    commentId: PropTypes.string.isRequired,
     post: PropTypes.shape({}).isRequired,
     wpUsers: PropTypes.shape(),
     onSubmit: PropTypes.func.isRequired,
@@ -147,7 +146,7 @@ class Comments extends React.Component {
 
   render() {
     const {
-      commentId, post, wpUsers, currentUser, dateFormatter,
+      post, wpUsers, currentUser, dateFormatter,
     } = this.props;
 
     const {
@@ -231,7 +230,6 @@ class Comments extends React.Component {
                   onKeyPress={e => e.which === 13 && this.send()}
                   type="textarea"
                   name="content"
-                  id={commentId}
                   rows={hasFocus || content ? 4 : 1}
                   placeholder={translate('comment_action')}
                   value={content}

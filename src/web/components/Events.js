@@ -8,7 +8,6 @@ import {
   CardText,
   CardBody,
   CardTitle,
-  Button,
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Error from './Error';
@@ -23,7 +22,9 @@ const scrollToTop = () => {
 };
 
 
-const EventListing = ({ error, loading, events, eventSetter }) => {
+const EventListing = ({
+  error, loading, events, eventSetter,
+}) => {
   // Error
   if (error) return <Error content={error} />;
 

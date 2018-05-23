@@ -17,7 +17,7 @@ export default {
   androidRipple: true,
   androidRippleColor: 'rgba(256, 256, 256, 0.3)',
   androidRippleColorDark: 'rgba(0, 0, 0, 0.15)',
-  btnUppercaseAndroidText: true,
+  btnUppercaseAndroidText: false,
 
   // Badge
   badgeBg: '#ED1727',
@@ -118,16 +118,16 @@ export default {
 
   // Footer
   footerHeight: isIphoneX ? 89 : 55,
-  footerDefaultBg: platform === 'ios' ? '#F8F8F8' : '#ee1d67',
+  footerDefaultBg: '#ee1d67',
   footerPaddingBottom: isIphoneX ? 34 : 0,
 
   // FooterTab
-  tabBarTextColor: platform === 'ios' ? '#737373' : '#bfc6ea',
-  tabBarTextSize: platform === 'ios' ? 14 : 11,
-  activeTab: platform === 'ios' ? '#007aff' : '#fff',
-  sTabBarActiveTextColor: '#007aff',
-  tabBarActiveTextColor: platform === 'ios' ? '#2874F0' : '#fff',
-  tabActiveBgColor: platform === 'ios' ? '#cde1f9' : '#ee1d67',
+  tabBarTextColor: '#ededed',
+  tabBarTextSize: 12,
+  activeTab: '#fff',
+  sTabBarActiveTextColor: '#fff',
+  tabBarActiveTextColor: '#fff',
+  tabActiveBgColor: '#f05627',
 
   // Header
   toolbarBtnColor: platform === 'ios' ? '#007aff' : '#fff',
@@ -206,7 +206,7 @@ export default {
   segmentBorderColorMain: platform === 'ios' ? '#a7a6ab' : '#ee1d67',
 
   // Spinner
-  defaultSpinnerColor: '#45D56E',
+  defaultSpinnerColor: '#ee1d67',
   inverseSpinnerColor: '#1A191B',
 
   // Tab

@@ -35,14 +35,12 @@ const EventView = (props) => {
     error,
     loading,
     upload,
-    events,
+    event,
     eventId,
-    commentId,
     addComment,
     addPost,
     likeFn,
     uploadFn,
-    participants,
     wpUsers,
     posts,
     notes,
@@ -53,12 +51,6 @@ const EventView = (props) => {
 
   // Error
   if (error) return <Error content={error} />;
-
-  // Get this event from all events
-  let event = null;
-  if (eventId && events) {
-    event = events.find(item => parseInt(item.id, 10) === parseInt(eventId, 10));
-  }
 
   // event not found
   if (!event) return <Error content={ErrorMessages.event404} />;
@@ -118,8 +110,8 @@ const EventView = (props) => {
 
   const styles = {
     topBanner: {
-      position: 'fixed',
-      top: '3.4rem',
+      position: 'absolute',
+      top: 0,
       left: 0,
       zIndex: 1000,
     },
@@ -195,7 +187,6 @@ const EventView = (props) => {
 
       <Comments
         wpUsers={wpUsers}
-        commentId={commentId.toString()}
         currentUser={currentUser}
         post={post}
         onSubmit={newComment}
@@ -212,7 +203,7 @@ const EventView = (props) => {
       <Row>
         <Col sm="12" className="pl-0 pr-0">
           <Card className="header-card" style={styles.mainCard}>
-            <div style={styles.topBanner}>
+            <div className="header-banner" style={styles.topBanner}>
               <CardImg top src={event.banner} alt={event.title} />
             </div>
             <CardBody>
@@ -255,10 +246,9 @@ EventView.propTypes = {
   error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
-  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  event: PropTypes.shape().isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
   notes: PropTypes.arrayOf(PropTypes.shape()),
-  commentId: PropTypes.string,
   addComment: PropTypes.func.isRequired,
   addPost: PropTypes.func.isRequired,
   likeFn: PropTypes.func.isRequired,
@@ -272,7 +262,6 @@ EventView.propTypes = {
 
 EventView.defaultProps = {
   currentUser: 1,
-  commentId: '1',
   locale: null,
   error: null,
   location: {},

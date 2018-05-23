@@ -1,6 +1,5 @@
 import moment from 'moment';
-import { Firebase, FirebaseRef, ImagesRef, StorageUpload } from '../lib/firebase';
-import { FCS_UPLOAD } from '../constants/firebase';
+import { Firebase, FirebaseRef, ImagesRef } from '../lib/firebase';
 
 
 /**
@@ -267,40 +266,7 @@ export function uploadFile(data) {
   };
 
   return dispatch => new Promise((resolve) => {
-    if (typeof file === 'string') {
-      const uri = file;
-      const fileName = uri.split('/').pop();
-
-      const uploadPath = `${path}/${eventId}/`;
-
-      // const token = await auth.currentUser.getIdToken(true); // true = forceRefresh
-      const mediaUpload = async () => {
-        const metadata = await StorageUpload({
-          uri,
-          fileName, // file name
-          endpoint: FCS_UPLOAD,
-          ImagesRef, // firebase.storage() ref.
-          uploadPath, // will store in `img` folder, defaults to root directory `/`
-          // token // pass the token if your endpoint requires authentication
-        });
-
-        console.log({
-          metadata,
-          downloadURL: metadata.downloadURLs[0],
-          storageLocation: `gs://${metadata.bucket}/${metadata.fullPath}`,
-        });
-
-        const downloadURL = metadata.downloadURLs[0];
-
-        return resolve(dispatch({
-          type: 'MEDIA_UPLOAD_END',
-          data: { downloadURL, metadata },
-        }));
-      };
-      return mediaUpload();
-    }
-
-    const fileName = file.name;
+    const fileName = new Date().getTime();
     const uploadTask = ImagesRef.child(`${path}/${eventId}/${fileName}`).put(file, metaData);
 
     return uploadTask.on('state_changed', (snapshot) => {

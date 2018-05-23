@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { StyleSheet, View } from 'react-native';
-import { Text, Form, Item, CardItem, Button, Body, Textarea, Thumbnail, Badge, Left, Icon } from 'native-base';
+import { StyleSheet, View, Share } from 'react-native';
+import { Text, Form, CardItem, Button, Body, Textarea, Thumbnail, Badge, Left, Icon } from 'native-base';
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
@@ -10,11 +10,19 @@ import { translate } from '../../i18n';
 
 const styles = StyleSheet.create({
   iconButton: {
-    borderRadius: 50,
-    width: 50,
+    marginRight: 15,
+    width: 80,
     height: 50,
     overflow: 'hidden',
     justifyContent: 'center',
+  },
+  dateTime: {
+    position: 'absolute',
+    top: 2,
+    right: 10,
+    fontWeight: '100',
+    fontSize: 9,
+    color: '#999',
   },
 });
 
@@ -30,19 +38,52 @@ const Avatar = ({ user, wpUsers, style }) => {
   );
 };
 
+Avatar.propTypes = {
+  user: PropTypes.number.isRequired,
+  wpUsers: PropTypes.shape().isRequired,
+  style: PropTypes.any,
+};
+
+Avatar.defaultProps = {
+  style: {},
+};
+
 const Counter = ({ count }) => {
   if (!Array.isArray(count) || !count.length) return null;
   return (
-    <Badge primary>
-      <Text>{count.length.toString()}</Text>
+    <Badge
+      primary
+      style={{
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        paddingHorizontal: 0,
+        paddingVertical: 0,
+        justifyContent: 'center',
+        flexDirection: 'row',
+      }}
+    >
+      <Text style={{ fontSize: 10, lineHeight: 20, color: '#fff' }}>
+        {count.length.toString()}
+      </Text>
     </Badge>
-  )
-}
+  );
+};
+
+Counter.propTypes = {
+  count: PropTypes.any,
+};
+
+Counter.defaultProps = {
+  count: [],
+};
 
 class Comments extends React.Component {
   static propTypes = {
-    commentId: PropTypes.string.isRequired,
-    post: PropTypes.shape({}).isRequired,
+    post: PropTypes.shape({
+      content: PropTypes.string,
+      media: PropTypes.arrayOf(PropTypes.shape()),
+    }).isRequired,
     wpUsers: PropTypes.shape(),
     onSubmit: PropTypes.func.isRequired,
     onLike: PropTypes.func.isRequired,
@@ -98,8 +139,26 @@ class Comments extends React.Component {
     const { onLike, post } = this.props;
     onLike(post);
   }
+  _share = () => {
+    const { content, media } = this.props.post;
+    const shareObj = {
+      message: '',
+      title: 'Compartilhado através do Live QI Plus',
+      url: '',
+    };
 
-  send = () => {
+    if (content) {
+      shareObj.message = content;
+    }
+
+    if (media && media[0] && media[0].src) {
+      shareObj.url = media[0].src;
+    }
+
+    Share.share(shareObj);
+  };
+
+  _send = () => {
     const { onSubmit, post } = this.props;
     const { content } = this.state;
 
@@ -115,7 +174,7 @@ class Comments extends React.Component {
 
   render() {
     const {
-      commentId, post, wpUsers, currentUser, dateFormatter,
+      post, wpUsers, currentUser, dateFormatter,
     } = this.props;
 
     const {
@@ -124,24 +183,31 @@ class Comments extends React.Component {
 
     return (
       <View>
-        <CardItem>
+        <CardItem style={{ flex: 1, justifyContent: 'space-between' }}>
           <Button
             transparent
             onPress={() => this.toggleLike()}
             style={styles.iconButton}
           >
-            <SimpleLineIcon size={20} name="like" />
+            <Icon size={20} name="thumbs-up" />
+            <Counter primary count={post.likes} />
           </Button>
-          <Counter primary count={post.likes} />
           <Button
             transparent
             onPress={() => this.handleOpen(!isOpen)}
             active={!!isOpen}
             style={styles.iconButton}
           >
-            <FontAwesomeIcon size={20} name="comment-o" />
+            <Icon size={20} name="chatbubbles" />
+            <Counter primary count={post.comments} />
           </Button>
-          <Counter primary count={post.comments} />
+          {/* <Button
+            transparent
+            onPress={() => this._share()}
+            style={styles.iconButton}
+          >
+            <SimpleLineIcon size={20} name="share" />
+          </Button> */}
         </CardItem>
 
         {(!!post.comments && !!post.comments.length && post.comments.map((comment, index) => {
@@ -150,8 +216,8 @@ class Comments extends React.Component {
 
           if (!!isOpen && index < loaded) {
               return (
-                <CardItem key={i}>
-                  <Avatar style={{ flex: 0.25 }} user={user} wpUsers={wpUsers} />
+                <CardItem style={{ position: 'relative' }} key={i}>
+                  <Avatar style={{ flex: 0.25, alignItems: 'flex-start' }} user={Number(user)} wpUsers={wpUsers} />
                   <Text style={styles.dateTime}>{dateFormatter(comment.datetime)}</Text>
                   <Body style={{ flex: 0.75 }}>
                     <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
@@ -163,7 +229,7 @@ class Comments extends React.Component {
               );
             }
             return null;
-          }) ) || null
+          })) || null
         }
 
         {(!!isOpen && !!post.comments && post.comments.length > loaded && (
@@ -175,7 +241,7 @@ class Comments extends React.Component {
               <Text>{translate('load_more')}</Text>
             </Button>
           </CardItem>
-        ) ) || null 
+        )) || null
         }
 
         {/* <Comment item={post.comments}> */}
@@ -199,7 +265,6 @@ class Comments extends React.Component {
               <Textarea
                 type="textarea"
                 name="content"
-                id={commentId}
                 rowSpan={hasFocus || content ? 4 : 2}
                 placeholder={translate('comment_action')}
                 value={content}
@@ -211,7 +276,7 @@ class Comments extends React.Component {
               />
             </View>
             <View style={{ flex: 0.25, marginTop: 5 }}>
-              <Button onPress={() => this.send()}>
+              <Button block small onPress={() => this._send()}>
                 <Icon name="paper-plane" />
               </Button>
             </View>

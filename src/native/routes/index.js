@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scene, Tabs, Stack } from 'react-native-router-flux';
+import { Scene, Stack } from 'react-native-router-flux';
 import { Icon } from 'native-base';
 import { locale } from 'core-js';
 import { translate } from '../../i18n';
@@ -52,6 +52,15 @@ const Index = (
         {...DefaultProps.navbarProps}
       >
         <Scene key="events" component={EventsContainer} Layout={EventsComponent} />
+        <Scene
+          back
+          clone
+          key="event"
+          title={translate('event', locale)}
+          component={EventContainer}
+          Layout={EventViewComponent}
+          {...DefaultProps.navbarProps}
+        />
       </Stack>
 
       <Stack
@@ -103,34 +112,6 @@ const Index = (
         />
       </Stack>
     </Scene>
-
-    <Tabs
-      key="tabbar"
-      swipeEnabled
-      type="replace"
-      tabBarPosition="bottom"
-      showLabel={false}
-      {...DefaultProps.tabProps}
-    >
-      <Scene
-        back
-        clone
-        key="event"
-        title={translate('event', locale)}
-        {...DefaultProps.navbarProps}
-        component={EventContainer}
-        Layout={EventViewComponent}
-      />
-      <Scene
-        back
-        clone
-        key="notes"
-        title={translate('event', locale)}
-        {...DefaultProps.navbarProps}
-        component={EventContainer}
-        Layout={EventViewComponent}
-      />
-    </Tabs>
   </Stack>
 );
 

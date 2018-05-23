@@ -16,7 +16,6 @@ const EventListing = ({
   locale,
   events,
   reFetch,
-  eventLoader,
   eventSetter,
 }) => {
   // Loading
@@ -28,8 +27,7 @@ const EventListing = ({
   const keyExtractor = item => (item.id && item.id.toString()) || '';
 
   const onPress = (item) => {
-    eventLoader();
-    eventSetter( item.id );
+    eventSetter(item.id);
     return Actions.event({ match: { params: { id: String(item.id) } } });
   };
 
@@ -66,7 +64,6 @@ const EventListing = ({
                   <Spacer size={15} />
                   <Button
                     block
-                    small
                     onPress={() => onPress(item)}
                   >
                     <Text>{translate('view_event', locale)}</Text>
@@ -98,7 +95,6 @@ EventListing.propTypes = {
   loader: PropTypes.bool,
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   reFetch: PropTypes.func,
-  eventLoader: PropTypes.func,
   eventSetter: PropTypes.func.isRequired,
 };
 
@@ -107,7 +103,6 @@ EventListing.defaultProps = {
   locale: null,
   error: null,
   reFetch: null,
-  eventLoader: null,
 };
 
 export default EventListing;

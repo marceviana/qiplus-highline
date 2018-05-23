@@ -5,11 +5,13 @@ import 'moment/locale/pt-br';
 
 import { Permissions, ImagePicker } from 'expo';
 import { View } from 'react-native';
-import { Text, Form, Button, Textarea } from 'native-base';
-import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
+import { Text, Form, Button, Textarea, Icon } from 'native-base';
 
-import { Media } from './Event';
 import { translate } from '../../i18n';
+import { uriToBlob } from '../../lib/functions';
+
+import Spacer from './Spacer';
+import { Media } from './Event';
 
 class PostNew extends React.Component {
   static propTypes = {
@@ -84,8 +86,8 @@ class PostNew extends React.Component {
       hasFocus: !!val,
     });
   }
-  handleFile = (uri) => {
-    const file = uri;
+  handleFile = (blob) => {
+    const file = blob;
     const { user, eventId } = this.props;
     const path = 'events';
 
@@ -120,14 +122,15 @@ class PostNew extends React.Component {
     }, 100);
   }
 
-  _pickImage = async () => {
+  _pickImage = async (source) => {
     const res = await Promise.all([
       Permissions.askAsync(Permissions.CAMERA),
       Permissions.askAsync(Permissions.CAMERA_ROLL),
     ]);
 
     if (res.some(({ status }) => status === 'granted')) {
-      const result = await ImagePicker.launchImageLibraryAsync({
+      const fn = source === 'camera' ? ImagePicker.launchCameraAsync : ImagePicker.launchImageLibraryAsync;
+      const result = await fn({
         allowsEditing: true,
       });
 
@@ -138,7 +141,8 @@ class PostNew extends React.Component {
           ...this.state,
           localURI: uri,
         });
-        this.handleFile(uri);
+        const blob = await uriToBlob(uri);
+        this.handleFile(blob);
       }
     }
   }
@@ -148,31 +152,30 @@ class PostNew extends React.Component {
       content, hasFocus, localURI,
     } = this.state;
 
-    const {
-      progress, upload,
-    } = this.props;
+    const { upload } = this.props;
 
-    const { metadata } = upload;
-    
-    const rows = hasFocus || content ? 5 : 2;
+    const { progress, metadata } = upload;
+
+    const rows = hasFocus || content ? 6 : 3;
 
     return (
       <Form style={{ flex: 1 }}>
         <Media style={{ flex: 1 }} media={[{ src: localURI, type: metadata.contentType }]} />
-        <View style={{ flex: 1 }} className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <View style={{ flex: 1 }}>
-            <Button block onPress={() => this._pickImage()} style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }}>
-              <SimpleLineIcon style={{ fontSize: 18, color: '#fff' }} name="picture" />
+        {!!progress && <View style={{ flex: 1 }} className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>}
+        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ flex: 0.9 }}>
+            <Button block onPress={() => this._pickImage('library')} style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }}>
+              <Icon size={18} style={{ color: '#fff' }} name="images" />
             </Button>
           </View>
-          <View style={{ flex: 1 }}>
-            <Button block style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }}>
-              <SimpleLineIcon style={{ fontSize: 18, color: '#fff' }} name="camera" />
+          <View style={{ flex: 0.9 }}>
+            <Button block onPress={() => this._pickImage('camera')} style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }}>
+              <Icon size={18} style={{ color: '#fff' }} name="camera" />
             </Button>
           </View>
         </View>
-        <View style={{ flex: 1, marginTop: 15 }}>
+        <Spacer size={15} />
+        <View style={{ flex: 1 }}>
           <Textarea
             type="textarea"
             name="content"
@@ -185,8 +188,9 @@ class PostNew extends React.Component {
             style={{ flex: 1, borderRadius: 3 }}
             bordered
           />
-          <Button block style={{ flex: 1, justifyContent: 'center', backgroundColor: '#ee1d67' }} onPress={() => this._send()}>
-            <SimpleLineIcon style={{ fontSize: 18, color: '#fff' }} name="paper-plane" />
+          <Spacer size={5} />
+          <Button block style={{ justifyContent: 'center', backgroundColor: '#ee1d67' }} onPress={() => this._send()}>
+            <Icon size={18} style={{ color: '#fff' }} name="send" />
           </Button>
         </View>
       </Form>

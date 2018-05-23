@@ -18,11 +18,15 @@ const styles = StyleSheet.create({
 const About = () => (
   <Container style={styles.homeContainer}>
     <Content>
-      <Image source={{ uri: 'http://qiplus.com.br/wp-content/uploads/recorte2.jpg' }} style={{ height: 400, width: null, flex: 1 }} />
+      <Image
+        source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/br-com-qiplus.appspot.com/o/live%2Fbanner-home.jpg?alt=media&token=c02f49be-dc94-4d44-a198-aa31ba21bc15' }}
+        style={{ height: 400, width: null, flex: 1 }}
+      />
       <Spacer size={30} />
       <View style={styles.homeWrapper}>
         <Button onPress={() => Actions.events()} >
-          <Icon name="calendar" /> <Text>Ver meus eventos no Live QI Plus</Text>
+          <Icon name="calendar" />
+          <View><Text>Ver meus eventos no Live QI Plus</Text></View>
         </Button>
       </View>
     </Content>

@@ -1,4 +1,3 @@
-
 const imageExtensions = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
 const audioExtensions = ['mp3', 'aac', 'wav'];
 const videoExtensions = ['mp4', 'ogg'];
@@ -109,3 +108,8 @@ export function getMediaType(str, type) {
   }
 }
 
+export async function uriToBlob(uri) {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  return blob;
+}

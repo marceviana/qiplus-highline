@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { getEvents, setEventsError, showLoader, eventSetter } from '../actions/events';
+import { getEvents, setEventsError, eventSetter } from '../actions/events';
 
 class EventListing extends Component {
   static propTypes = {
@@ -18,7 +18,6 @@ class EventListing extends Component {
     match: PropTypes.shape({
       params: PropTypes.shape({}),
     }),
-    showLoader: PropTypes.func.isRequired,
     eventSetter: PropTypes.func.isRequired,
     getEvents: PropTypes.func.isRequired,
     setEventsError: PropTypes.func.isRequired,
@@ -57,7 +56,6 @@ class EventListing extends Component {
         events={events.events}
         member={member}
         reFetch={() => this.fetchEvents()}
-        eventLoader={this.props.showLoader}
         eventSetter={this.props.eventSetter}
       />
     );
@@ -71,7 +69,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  showLoader,
   getEvents,
   setEventsError,
   eventSetter,

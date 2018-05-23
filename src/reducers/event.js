@@ -4,8 +4,25 @@ export const initialState = Store;
 
 export default function eventSingleReducer(state = initialState, action) {
   console.log(action.type);
-  console.log(action);
+  // console.log(action);
   switch (action.type) {
+    case 'EVENTS_SETTER': {
+      const eventId = action.data;
+      const { events } = state;
+      const event = events.find(({ id }) => id === eventId);
+      return {
+        ...state,
+        eventId,
+        event,
+      };
+    }
+    case 'EVENTS_REPLACE': {
+      const events = action.data;
+      return {
+        ...state,
+        events,
+      };
+    }
     case 'EVENT_ERROR': {
       return {
         ...state,
