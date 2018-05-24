@@ -1,13 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FlatList, TouchableOpacity, RefreshControl, Image } from 'react-native';
-import { Container, Content, Card, CardItem, Body, Text, Spinner, Button } from 'native-base';
+import { FlatList, TouchableOpacity, RefreshControl, View, Image } from 'react-native';
+import { Container, Content, Card, CardItem, Body, Text, Spinner, Button, Icon } from 'native-base';
 import { Actions } from 'react-native-router-flux';
 import { translate } from '../../i18n';
 import Loading from './Loading';
 import Error from './Error';
 import Header from './Header';
 import Spacer from './Spacer';
+
+const NoEvents = () => (
+  <View>
+    <Text style={{ fontSize: 35 }}>Ops...</Text>
+    <Spacer size={20} />
+    <Text style={{ fontSize: 22 }}>
+      Parece que você não está inscrito em nenuhum evento ativo no Live QI Plus
+    </Text>
+    <Spacer size={20} />
+    <Button primary onPress={() => Actions.home()}>
+      <Icon name="home" />
+      <Text style={{ fontSize: 18 }}>Voltar ao início</Text>
+    </Button>
+  </View>
+);
 
 const EventListing = ({
   error,
@@ -38,6 +53,7 @@ const EventListing = ({
           title={translate('my_events_title', locale)}
           content={translate('my_events_subtitle', locale)}
         />
+        {!events.length && <NoEvents />}
         {loader && <Spinner color="blue" />}
         <FlatList
           numColumns={1}

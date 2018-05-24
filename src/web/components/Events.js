@@ -24,7 +24,7 @@ const scrollToTop = () => {
 const NoEvents = () => (
   <div>
     <h3>Ops...</h3>
-    <p>Parece que você não está inscrito em nenuhum evento do Live QI Plus</p>
+    <p>Parece que você não está inscrito em nenuhum evento ativo no Live QI Plus</p>
     <Link onClick={scrollToTop} to="/">
       Voltar ao início
     </Link>

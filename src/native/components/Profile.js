@@ -13,8 +13,8 @@ const Profile = ({ member, logout }) => (
           <View>
             <Content padder>
               <Header
-                title={`Hi ${member.firstName},`}
-                content={`You are currently logged in as ${member.email}`}
+                title={`Olá ${member.firstName || member.first_name},`}
+                content={`Você está conectado como ${member.email}`}
               />
             </Content>
 
@@ -23,7 +23,7 @@ const Profile = ({ member, logout }) => (
                 <Icon name="person-add" />
               </Left>
               <Body>
-                <Text>Update My Profile</Text>
+                <Text>Atualizar Meus Dados</Text>
               </Body>
             </ListItem>
             <ListItem onPress={logout} icon>
@@ -39,8 +39,8 @@ const Profile = ({ member, logout }) => (
           <View>
             <Content padder>
               <Header
-                title="Hi there,"
-                content="Please login to gain extra access"
+                title="Bem-vindo ao Live QI Plus!"
+                content="Faça login para interagir com seus colegas de evento"
               />
             </Content>
 
@@ -57,7 +57,7 @@ const Profile = ({ member, logout }) => (
                 <Icon name="add-circle" />
               </Left>
               <Body>
-                <Text>Sign Up</Text>
+                <Text>Criar uma conta no Live QI Plus</Text>
               </Body>
             </ListItem>
             <ListItem onPress={Actions.forgotPassword} icon>
@@ -65,19 +65,19 @@ const Profile = ({ member, logout }) => (
                 <Icon name="help-buoy" />
               </Left>
               <Body>
-                <Text>Forgot Password</Text>
+                <Text>Esqueci minha senha</Text>
               </Body>
             </ListItem>
           </View>
         }
-        <ListItem onPress={Actions.locale} icon>
+        {/* <ListItem onPress={Actions.locale} icon>
           <Left>
             <Icon name="ios-flag" />
           </Left>
           <Body>
             <Text>Change Language</Text>
           </Body>
-        </ListItem>
+        </ListItem> */}
       </List>
     </Content>
   </Container>

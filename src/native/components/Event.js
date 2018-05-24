@@ -7,7 +7,7 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 import { Actions } from 'react-native-router-flux';
 import { Video } from 'expo';
-import { FlatList, RefreshControl, Image, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, WebView, Image, StyleSheet, View } from 'react-native';
 import { Container, Content, Footer, FooterTab, Card, CardItem, Body, H3, Text, Button, Icon, Spinner, Thumbnail } from 'native-base';
 import Colors from '../../../native-base-theme/variables/commonColor';
 import ErrorMessages from '../../constants/errors';
@@ -294,7 +294,7 @@ const EventView = (props) => {
                 <CardItem cardBody style={styles.cardBody}>
                   <Body>
                     <Spacer size={10} />
-                    <Text>{item.content}</Text>
+                    <WebView source={{ html: item.content }} />
                     <Spacer size={15} />
                     <ActionLink post={item} />
                   </Body>
