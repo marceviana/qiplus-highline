@@ -12,29 +12,35 @@ import {
   CardImg,
   CardTitle,
 } from 'reactstrap';
-import { Link } from 'react-router-dom';
 import ErrorMessages from '../../constants/errors';
 import Loading from './Loading';
 import Error from './Error';
 import Comments from './Comments';
 import PostNew from './PostNew';
 import EventNavBar from './EventNavBar';
+import Timer from './Timer';
+
+export const dateFormatter = (datetime, locale = 'pt') => {
+  if (!datetime) return '';
+  moment.locale(locale);
+  const formattedDate = moment(datetime).calendar();
+  return formattedDate || '';
+};
 
 const EventView = (props) => {
   const {
-    locale,
+    member,
     location,
     currentUser,
     error,
     loading,
-    events,
+    upload,
+    event,
     eventId,
-    commentId,
     addComment,
     addPost,
     likeFn,
     uploadFn,
-    participants,
     wpUsers,
     posts,
     notes,
@@ -46,29 +52,50 @@ const EventView = (props) => {
   // Error
   if (error) return <Error content={error} />;
 
-  // Get this event from all events
-  let event = null;
-  if (eventId && events) {
-    event = events.find(item => parseInt(item.id, 10) === parseInt(eventId, 10));
-  }
-
   // event not found
   if (!event) return <Error content={ErrorMessages.event404} />;
 
-  const isPit = location.pathname.indexOf('notes') >= 0;
+  const isPitch = location.pathname.indexOf('notes') >= 0;
 
-  const timeline = (!isPit && ((posts.length && posts) || event.posts)) || event.notes;
+  const timeline = isPitch ? notes : posts;
 
   const Avatar = ({ user, style }) => {
-    if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>
+    if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>;
     return (
       <div style={style} className="avatar-img">
-        { 
-          !!wpUsers[user] && wpUsers[user].avatar && 
+        {
+          !!wpUsers[user] && wpUsers[user].avatar &&
           <img alt="" src={wpUsers[user].avatar} />
         }
       </div>
-    )
+    );
+  };
+
+  Avatar.propTypes = {
+    user: PropTypes.number.isRequired,
+    style: PropTypes.any,
+  };
+
+  Avatar.defaultProps = {
+    style: {},
+  };
+
+  const ActionLink = ({ action_link, deadline }) => (
+    isPitch && action_link && 
+    (!deadline || new Date(deadline).getTime() < new Date().getTime()) && (
+    <CardFooter style={{ fontSize: 13 }}>
+      <Timer href={action_link} deadline={deadline} />
+    </CardFooter>
+    )) || null;
+
+  ActionLink.propTypes = {
+    action_link: PropTypes.string,
+    deadline: PropTypes.string,
+  };
+
+  ActionLink.defaultProps = {
+    action_link: '',
+    deadline: '',
   };
 
   const newComment = (post, content) => {
@@ -77,6 +104,7 @@ const EventView = (props) => {
       content,
       eventId,
       postId: post.id,
+      postType: (isPitch ? 'notes' : 'post'),
     });
   };
 
@@ -85,6 +113,7 @@ const EventView = (props) => {
       user: currentUser,
       eventId,
       postId: post.id,
+      postType: (isPitch ? 'notes' : 'post'),
     });
   };
 
@@ -92,14 +121,14 @@ const EventView = (props) => {
     addPost({
       ...post,
       eventId,
-      username: wpUsers[currentUser].display_name,
+      username: member.display_name,
     });
   };
 
   const styles = {
     topBanner: {
-      position: 'fixed',
-      top: '3.4rem',
+      position: 'absolute',
+      top: 0,
       left: 0,
       zIndex: 1000,
     },
@@ -153,13 +182,6 @@ const EventView = (props) => {
     },
   };
 
-  const dateFormat = (datetime) => {
-    if (!datetime) return '';
-    moment.locale(locale || 'pt');
-    const formattedDate = moment(datetime).calendar();
-    return formattedDate || '';
-  };
-
   // Build Cards for Listing
   const cards = timeline.slice(0).reverse().map(post => (
     post.username &&
@@ -171,27 +193,23 @@ const EventView = (props) => {
           <CardImg top src={post.media[0].src} />
       )}
       <CardBody style={styles.cardBody}>
-        <Badge style={styles.dateTime}>{dateFormat(post.datetime)}</Badge>
-        <Avatar style={styles.avatar} user={post.user}/>
+        <Badge className="bg-qi" style={styles.dateTime}>{dateFormatter(post.datetime)}</Badge>
+        <Avatar style={styles.avatar} user={Number(post.user)} />
         <CardTitle style={styles.userName}>{post.username}</CardTitle>
         <CardText style={{ fontSize: 13 }}>
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <span dangerouslySetInnerHTML={{ __html: post.content }} />
         </CardText>
-        {(isPit && post.action_link && (
-          <CardFooter style={{ fontSize: 13 }}>
-            <a href="post.action_link">{post.action_link}</a>
-          </CardFooter>
-        )) || null
-        }
+        <ActionLink post={post} />
       </CardBody>
+
       <Comments
-        wpUsers={wpUsers} 
-        commentId={commentId.toString()}
-        currentUser={currentUser} 
-        post={post} 
-        onSubmit={newComment} 
-        onLike={toggleLike} 
-        {...props} 
+        wpUsers={wpUsers}
+        currentUser={currentUser}
+        post={post}
+        onSubmit={newComment}
+        onLike={toggleLike}
+        dateFormatter={dateFormatter}
+        {...props}
       />
     </Card>
   ));
@@ -201,17 +219,18 @@ const EventView = (props) => {
     <div>
       <Row>
         <Col sm="12" className="pl-0 pr-0">
-          <Card style={styles.mainCard}>
-            <div style={styles.topBanner}>
+          <Card className="header-card" style={styles.mainCard}>
+            <div className="header-banner" style={styles.topBanner}>
               <CardImg top src={event.banner} alt={event.title} />
             </div>
             <CardBody>
               <CardTitle>{event.title}</CardTitle>
               <CardText>{event.description}</CardText>
             </CardBody>
-            { (!isPit && (
+            { (!isPitch && (
               <CardFooter style={{ fontSize: 13 }}>
                 <PostNew
+                  upload={upload}
                   user={currentUser}
                   eventId={eventId}
                   onSubmit={newPost}
@@ -232,8 +251,8 @@ const EventView = (props) => {
       <EventNavBar
         eventId={eventId}
         pathname={location.pathname}
-        postsLen={(event.posts && event.posts.length) || 0}
-        notesLen={(event.notes && event.notes.length) || 0}
+        postsLen={(posts && posts.length) || (event.posts && event.posts.length) || 0}
+        notesLen={(notes && notes.length) || (event.notes && event.notes.length) || 0}
       />
     </div>
   );
@@ -244,10 +263,10 @@ EventView.propTypes = {
   error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
-  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  event: PropTypes.shape().isRequired,
+  member: PropTypes.shape().isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
   notes: PropTypes.arrayOf(PropTypes.shape()),
-  commentId: PropTypes.string,
   addComment: PropTypes.func.isRequired,
   addPost: PropTypes.func.isRequired,
   likeFn: PropTypes.func.isRequired,
@@ -255,15 +274,16 @@ EventView.propTypes = {
   location: PropTypes.shape(),
   participants: PropTypes.shape(),
   wpUsers: PropTypes.shape(),
+  upload: PropTypes.shape(),
   currentUser: PropTypes.number,
 };
 
 EventView.defaultProps = {
-  currentUser: 1,
-  commentId: '1',
+  currentUser: 0,
   locale: null,
   error: null,
   location: {},
+  upload: {},
   participants: {},
   posts: [],
   notes: [],

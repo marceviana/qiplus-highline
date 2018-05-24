@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { getEvents, setEventsError, showLoader, eventSetter } from '../actions/events';
+import { getEvents, setEventsError, eventSetter } from '../actions/events';
 
 class EventListing extends Component {
   static propTypes = {
@@ -18,7 +18,6 @@ class EventListing extends Component {
     match: PropTypes.shape({
       params: PropTypes.shape({}),
     }),
-    showLoader: PropTypes.func.isRequired,
     eventSetter: PropTypes.func.isRequired,
     getEvents: PropTypes.func.isRequired,
     setEventsError: PropTypes.func.isRequired,
@@ -47,6 +46,12 @@ class EventListing extends Component {
     } = this.props;
     const id = (match && match.params && match.params.id) ? match.params.id : null;
 
+    let userEvents = events.events || [];
+    userEvents = userEvents.filter(item =>
+      item && item.participants &&
+      member && member.id &&
+      item.participants[member.id]);
+
     return (
       <Layout
         eventId={id}
@@ -54,10 +59,9 @@ class EventListing extends Component {
         error={events.error}
         loader={events.loader}
         loading={events.loading}
-        events={events.events}
+        events={userEvents}
         member={member}
         reFetch={() => this.fetchEvents()}
-        eventLoader={this.props.showLoader}
         eventSetter={this.props.eventSetter}
       />
     );
@@ -71,7 +75,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  showLoader,
   getEvents,
   setEventsError,
   eventSetter,

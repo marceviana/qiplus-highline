@@ -45,7 +45,7 @@ class Login extends React.Component {
 
   handleSubmit = () => {
     this.props.onFormSubmit(this.state)
-      .then(() => Actions.tabbar())
+      .then(() => Actions.events())
       .catch(e => console.log(`Error: ${e}`));
   }
 
@@ -58,8 +58,8 @@ class Login extends React.Component {
       <Container>
         <Content padder>
           <Header
-            title="Welcome back"
-            content="Please use your email and password to login."
+            title="Bem-vindo ao Live QI Plus!"
+            content="Faça login para começar a interagir com seus colegas de evento."
           />
 
           {error && <Messages message={error} />}

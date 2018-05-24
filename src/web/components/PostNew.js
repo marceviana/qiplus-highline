@@ -30,6 +30,12 @@ class PostNew extends React.Component {
     uploadFn: PropTypes.func.isRequired,
     user: PropTypes.number.isRequired,
     eventId: PropTypes.number.isRequired,
+    upload: PropTypes.shape({
+      uploading: PropTypes.bool,
+      metadata: PropTypes.shape(),
+      progress: PropTypes.number,
+      error: PropTypes.string,
+    }),
   }
 
   static defaultProps = {
@@ -45,11 +51,15 @@ class PostNew extends React.Component {
     },
     initialState: {
       content: '',
-      downloadURL: '',
-      metadata: {},
+      localURI: '',
       hasFocus: false,
       showComments: false,
+    },
+    upload: {
+      uploading: false,
+      metadata: {},
       progress: 0,
+      error: '',
     },
   }
 
@@ -60,6 +70,7 @@ class PostNew extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
     this.handleFile = this.handleFile.bind(this);
+    this._send = this._send.bind(this);
   }
 
   handleChange = (event) => {
@@ -81,45 +92,22 @@ class PostNew extends React.Component {
 
     this.props.uploadFn({
       eventId, path, file, user,
-    }, (result) => {
-      if (result.progress) {
-        this.setState({
-          ...this.state,
-          progress: result.progress,
-        });
-        return;
-      }
-
-      if (result.downloadURL) {
-        const { metadata, downloadURL } = result;
-        this.setState({
-          ...this.state,
-          progress: 0,
-          downloadURL,
-          metadata,
-        });
-        return;
-      }
-
-      if (result.error) {
-        this.setState({
-          ...this.state,
-          progress: 0,
-          downloadURL: '',
-          metadata: {},
-        });
-      }
     });
   }
 
-  send = () => {
-    const { onSubmit, post, user } = this.props;
-    const { content, downloadURL, metadata } = this.state;
+  _send = () => {
+    const {
+      onSubmit, post, user, upload,
+    } = this.props;
 
-    if (!content) return;
+    const { content } = this.state;
+    const { metadata } = upload;
 
-    const type = (metadata && metadata.contentType) || '';
-    const src = downloadURL || '';
+    if (!content && (!metadata || !metadata.downloadURL)) return;
+
+    const metaInfo = (metadata && metadata.metadata) || {};
+    const type = (metaInfo && metaInfo.contentType) || (metadata && metadata.contentType) || '';
+    const src = metadata.downloadURL || '';
 
     onSubmit({
       ...post,
@@ -136,17 +124,25 @@ class PostNew extends React.Component {
 
   render() {
     const {
-      content, hasFocus, downloadURL, progress, metadata,
+      content, hasFocus,
     } = this.state;
+
+    const {
+      upload,
+    } = this.props;
+
+    const { metadata, progress } = upload;
+    const downloadURL = (metadata && metadata.downloadURL) || '';
+    const metaInfo = (metadata && metadata.metadata) || {};
 
     const rows = hasFocus || content ? 4 : 1;
 
     return (
       <FormGroup style={{ marginTop: 15 }}>
         {
-          downloadURL && (
-            metadata.contentType && metadata.contentType.indexOf('vid') >= 0 ?
-              <div className="post-video"><video width="100%" controls><track kind="captions" /><source src={downloadURL} type={metadata.contentType} /></video></div>
+          !!downloadURL && (
+            metaInfo.contentType && metaInfo.contentType.indexOf('vid') >= 0 ?
+              <div className="post-video"><video width="100%" controls><track kind="captions" /><source src={downloadURL} type={metaInfo.contentType} /></video></div>
             :
               <div className="post-img"><img src={downloadURL} alt="My upload" /></div>
           )
@@ -173,7 +169,7 @@ class PostNew extends React.Component {
           <Col sm={12}>
             <InputGroup size="sm" style={{ marginTop: 15 }}>
               <Input
-                onKeyPress={e => e.which === 13 && this.send()}
+                onKeyPress={e => e.which === 13 && this._send()}
                 type="textarea"
                 name="content"
                 placeholder={translate('post_placeholder')}
@@ -184,7 +180,7 @@ class PostNew extends React.Component {
                 onBlur={() => this.handleFocus(false)}
               />
               <InputGroupAddon addonType="append">
-                <Button size="sm" className={hasFocus || content ? 'bg-qi' : ''} color="default" onClick={() => this.send()}>
+                <Button size="sm" className={hasFocus || content ? 'bg-qi' : ''} color="default" onClick={() => this._send()}>
                   <i className="icon-paper-plane" />
                 </Button>
               </InputGroupAddon>

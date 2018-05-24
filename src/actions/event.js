@@ -1,4 +1,6 @@
+import moment from 'moment';
 import { Firebase, FirebaseRef, ImagesRef } from '../lib/firebase';
+
 
 /**
   * Set an Error Message
@@ -10,18 +12,16 @@ export function showLoader() {
   };
 }
 
-export function listenToEvent(eventId) {
+export function listenToPosts(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
-  
-  console.log('eventId', eventId);
 
-  const ref = FirebaseRef.child(`events/${eventId}/posts`);
+  const ref = FirebaseRef.child(`live_posts/${eventId}`);
 
-  return dispatch => new Promise((resolve, reject) =>
+  return dispatch => new Promise(resolve =>
     ref.on('value', (snapshot) => {
       const posts = snapshot.val() || {};
 
-      console.log('posts', posts);
+      // console.log('posts', posts);
 
       return resolve(dispatch({
         type: 'POSTS_REPLACE',
@@ -30,20 +30,46 @@ export function listenToEvent(eventId) {
     })).catch(e => console.log(e));
 }
 
-export function getPosts(eventId) {
+export function listenToNotes(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
-  const ref = FirebaseRef.child(`events/${eventId}/posts`);
+  const ref = FirebaseRef.child(`hot_posts/${eventId}`);
+
+  return dispatch => new Promise(resolve =>
+    ref.on('value', (snapshot) => {
+      const notes = snapshot.val() || {};
+
+      // console.log('notes', notes);
+
+      return resolve(dispatch({
+        type: 'NOTES_REPLACE',
+        data: notes,
+      }));
+    })).catch(e => console.log(e));
+}
+
+export function getPosts(addedData) {
+  // user, eventId, postId, postType,
+  const {
+    eventId, postType,
+  } = addedData;
+
+  if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
+
+  const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+  const ACTION_TYPE = postType === 'notes' ? 'NOTES_REPLACE' : 'POSTS_REPLACE';
+
+  const ref = FirebaseRef.child(`${childKey}/${eventId}`);
 
   return dispatch => new Promise((resolve, reject) =>
     ref.once('value')
       .then((snapshot) => {
         const posts = snapshot.val() || {};
 
-        // return resolve(dispatch({
-        // type: 'POSTS_REPLACE',
-        // data: posts,
-        // }));
+        return resolve(dispatch({
+          type: ACTION_TYPE,
+          data: posts,
+        }));
       }).catch(reject)).catch(e => console.log(e));
 }
 
@@ -55,69 +81,109 @@ export function setLoading() {
 
 export function addComment(commentData) {
   const {
-    user, content, eventId, postId,
+    user, content, eventId, postId, postType,
   } = commentData;
 
   // console.log('commentData', commentData);
 
-  if (!user || !eventId || !postId || Firebase === null) {
+  if (!user || !eventId || (!postId && postId !== 0) || Firebase === null) {
     return () => new Promise(resolve => resolve());
   }
 
-  setLoading();
+  return dispatch => new Promise((resolve, reject) => {
 
-  const postRef = FirebaseRef.child(`events/${eventId}/posts/${postId}`);
+    const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+    const postRef = FirebaseRef.child(`${childKey}/${eventId}/${postId}`);
 
-  const pushToKey = (snapshot) => {
-    const post = snapshot.val();
-    const comments = post.comments || [];
+    const failureCallback = (e) => {
+      console.log('failureCallback', e);
+      reject(dispatch({
+        type: 'POSTS_ERROR',
+        data: e,
+      }));
+    };
 
-    comments.push({ user, content });
-    post.comments = comments;
+    const pushToKey = (snapshot) => {
+      const post = snapshot.val();
+      const comments = post.comments || [];
+      const nowIso = moment().format('YYYY-MM-DD hh:mm:ss');
 
-    postRef.set(post);
-    postRef.off('value', pushToKey);
-  };
+      comments.push({ user, content, datetime: nowIso });
+      post.comments = comments;
 
-  postRef.once('value', pushToKey);
+      postRef.set(post);
+      postRef.off('value', pushToKey);
+    };
 
-  return () => new Promise(resolve => resolve());
+    postRef.once('value', pushToKey, failureCallback);
+
+    resolve(dispatch({
+      type: 'POSTS_FETCHING',
+    }));
+  }).catch(e => console.log(e));
 }
 
 export function addPost(postData) {
   const {
-    content, eventId,
+    content, eventId, postType, downloadURL,
   } = postData;
 
-  if (!content || !eventId || Firebase === null) return () => new Promise(resolve => resolve());
+  if ((!content && !downloadURL) || !eventId || Firebase === null) {
+    return () => new Promise(resolve => resolve());
+  }
 
+  return dispatch => new Promise((resolve, reject) => {
+    const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+    const postsRef = FirebaseRef.child(`${childKey}/${eventId}`);
+    const lastRef = postsRef.orderByKey().limitToLast(1);
 
-  const postsRef = FirebaseRef.child(`events/${eventId}/posts`);
-  const lastRef = postsRef.orderByKey().limitToLast(1);
+    const failureCallback = (e) => {
+      console.log('failureCallback', e);
+      reject(dispatch({
+        type: 'POSTS_ERROR',
+        data: e,
+      }));
+    };
 
-  const addToNextKey = (snapshot) => {
-    const newPostId = snapshot.key && Number(snapshot.key) + 1;
-    postsRef.child(newPostId).set({ ...postData, content, id: newPostId });
-    lastRef.off('child_added', addToNextKey);
-  };
+    const addToNextKey = (snapshot) => {
+      const newPostId = snapshot.key && Number(snapshot.key) + 1;
+      const nowIso = moment().format('YYYY-MM-DD hh:mm:ss');
 
-  lastRef.once('child_added', addToNextKey);
+      postsRef.child(newPostId).set({
+        ...postData,
+        content,
+        id: newPostId,
+        datetime: nowIso,
+      });
 
-  return () => new Promise(resolve => resolve());
+      lastRef.off('child_added', addToNextKey);
+    };
+
+    lastRef.once('child_added', addToNextKey, failureCallback);
+
+    dispatch({
+      type: 'POSTS_POSTED',
+    });
+
+    resolve(dispatch({
+      type: 'POSTS_FETCHING',
+    }));
+  }).catch(e => console.log(e));
 }
 
 export function toggleLike(likeData) {
   const {
-    user, eventId, postId,
+    user, eventId, postId, postType,
   } = likeData;
 
-  console.log('likeData', likeData);
+  // console.log('likeData', likeData);
 
-  if (!user || !eventId || !postId || Firebase === null) {
+  if (!user || !eventId || (!postId && postId !== 0) || Firebase === null) {
     return () => new Promise(resolve => resolve());
   }
 
-  const postRef = FirebaseRef.child(`events/${eventId}/posts/${postId}`);
+  const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+  const postRef = FirebaseRef.child(`${childKey}/${eventId}/${postId}`);
 
   const pushToKey = (snapshot) => {
     const post = snapshot.val();
@@ -190,7 +256,7 @@ export function getParticipants(participantIds) {
     })).catch(e => console.log(e));
 }
 
-export function uploadFile(data, callback) {
+export function uploadFile(data) {
   const {
     eventId, path, file, user,
   } = data;
@@ -201,16 +267,27 @@ export function uploadFile(data, callback) {
     },
   };
 
-  const fileName = file.name;
-  const uploadTask = ImagesRef.child(`${path}/${eventId}/${fileName}`).put(file, metaData);
+  return dispatch => new Promise((resolve) => {
+    const fileName = new Date().getTime();
+    const uploadTask = ImagesRef.child(`${path}/${eventId}/${fileName}`).put(file, metaData);
 
-  uploadTask.on('state_changed', (snapshot) => {
-    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    callback({ progress });
-  }, (error) => {
-    callback({ error });
-  }, () => {
-    const { downloadURL, metadata } = uploadTask.snapshot;
-    callback({ downloadURL, metadata });
+    return uploadTask.on('state_changed', (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      resolve(dispatch({
+        type: 'MEDIA_UPLOAD_PROGRESS',
+        data: progress,
+      }));
+    }, (error) => {
+      resolve(dispatch({
+        type: 'MEDIA_UPLOAD_ERROR',
+        data: error,
+      }));
+    }, () => {
+      const { downloadURL, metadata } = uploadTask.snapshot;
+      resolve(dispatch({
+        type: 'MEDIA_UPLOAD_END',
+        data: { downloadURL, metadata },
+      }));
+    });
   });
 }

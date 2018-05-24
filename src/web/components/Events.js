@@ -8,7 +8,6 @@ import {
   CardText,
   CardBody,
   CardTitle,
-  Button,
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Error from './Error';
@@ -22,8 +21,19 @@ const scrollToTop = () => {
   }
 };
 
+const NoEvents = () => (
+  <div>
+    <h3>Ops...</h3>
+    <p>Parece que você não está inscrito em nenuhum evento do Live QI Plus</p>
+    <Link onClick={scrollToTop} to="/">
+      Voltar ao início
+    </Link>
+  </div>
+);
 
-const EventListing = ({ error, loading, events, eventSetter }) => {
+const EventListing = ({
+  error, loading, events, eventSetter,
+}) => {
   // Error
   if (error) return <Error content={error} />;
 
@@ -45,13 +55,13 @@ const EventListing = ({ error, loading, events, eventSetter }) => {
   return (
     <div>
       <Row>
-        <Col sm="12">
-          <h1>{translate('events')}</h1>
+        <Col sm="12" className="pt-3">
+          <h2>{translate('events')}</h2>
         </Col>
       </Row>
       <Row className={loading ? 'content-loading' : ''}>
         <Col sm="12" className="card-columns">
-          {cards}
+          {(events.length && cards) || <NoEvents />}
         </Col>
       </Row>
     </div>
