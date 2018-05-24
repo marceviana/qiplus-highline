@@ -136,6 +136,7 @@ const EventView = (props) => {
     upload,
     error,
     loading,
+    member,
     event,
     eventId,
     addComment,
@@ -158,9 +159,7 @@ const EventView = (props) => {
 
   const isPitch = location.pathname && location.pathname.indexOf('notes') >= 0;
 
-  const timeline = (!isPitch && (
-    (posts.length && posts) || event.posts
-  )) || ((notes.length && notes) || event.notes);
+  const timeline = isPitch ? notes : posts;
 
   const Avatar = ({ user, style }) => {
     if (!wpUsers[user] || !wpUsers[user].avatar) return <View style={style}><FontAwesomeIcon style={styles.avatarIcon} size={60} name="user-circle-o" /></View>;
@@ -219,7 +218,7 @@ const EventView = (props) => {
     addPost({
       ...post,
       eventId,
-      username: wpUsers[currentUser].display_name,
+      username: member.display_name,
     });
   };
 
@@ -352,7 +351,7 @@ const EventView = (props) => {
             <Text style={styles.footerText}>Participantes</Text>
           </Button>
         </FooterTab>
-      </Footer>  
+      </Footer>
     </Container>
   );
 };
@@ -365,6 +364,7 @@ EventView.propTypes = {
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
   event: PropTypes.shape().isRequired,
+  member: PropTypes.shape().isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
   notes: PropTypes.arrayOf(PropTypes.shape()),
   addComment: PropTypes.func.isRequired,
@@ -376,7 +376,7 @@ EventView.propTypes = {
 };
 
 EventView.defaultProps = {
-  currentUser: 1,
+  currentUser: 0,
   locale: null,
   error: null,
   location: {},

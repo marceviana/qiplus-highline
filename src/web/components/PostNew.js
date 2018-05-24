@@ -105,7 +105,8 @@ class PostNew extends React.Component {
 
     if (!content && (!metadata || !metadata.downloadURL)) return;
 
-    const type = (metadata && metadata.contentType) || '';
+    const metaInfo = (metadata && metadata.metadata) || {};
+    const type = (metaInfo && metaInfo.contentType) || (metadata && metadata.contentType) || '';
     const src = metadata.downloadURL || '';
 
     onSubmit({
@@ -132,6 +133,7 @@ class PostNew extends React.Component {
 
     const { metadata, progress } = upload;
     const downloadURL = (metadata && metadata.downloadURL) || '';
+    const metaInfo = (metadata && metadata.metadata) || {};
 
     const rows = hasFocus || content ? 4 : 1;
 
@@ -139,8 +141,8 @@ class PostNew extends React.Component {
       <FormGroup style={{ marginTop: 15 }}>
         {
           !!downloadURL && (
-            metadata.contentType && metadata.contentType.indexOf('vid') >= 0 ?
-              <div className="post-video"><video width="100%" controls><track kind="captions" /><source src={downloadURL} type={metadata.contentType} /></video></div>
+            metaInfo.contentType && metaInfo.contentType.indexOf('vid') >= 0 ?
+              <div className="post-video"><video width="100%" controls><track kind="captions" /><source src={downloadURL} type={metaInfo.contentType} /></video></div>
             :
               <div className="post-img"><img src={downloadURL} alt="My upload" /></div>
           )

@@ -59,9 +59,10 @@ class EventView extends Component {
   }
 
   componentDidMount = () => {
-    this.props.listenToPosts(extractId(this.props.event));
-    this.props.listenToNotes(extractId(this.props.event));
-    this.fetchUsers(extractParticipantIds(this.props.event));
+    const { event } = this.props.event;
+    this.props.listenToPosts(extractId(event));
+    this.props.listenToNotes(extractId(event));
+    this.fetchUsers(extractParticipantIds(event));
   };
 
   newComment = commentData =>
@@ -95,11 +96,12 @@ class EventView extends Component {
       <Layout
         location={location || { pathname: (match && match.params && match.params.url) || '/' }}
         eventId={Number(id)}
+        currentUser={Number(member.id)}
         event={event.event}
         upload={upload}
         locale={locale}
-        posts={(posts.length && posts) || event.posts}
-        notes={(notes.length && notes) || event.notes}
+        posts={posts}
+        notes={notes}
         error={event.error}
         loading={event.loading}
         loadingData={event.loadingData}

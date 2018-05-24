@@ -106,7 +106,8 @@ class PostNew extends React.Component {
 
     if (!content && (!metadata || !metadata.downloadURL)) return;
 
-    const type = (metadata && metadata.contentType) || '';
+    const metaInfo = (metadata && metadata.metadata) || {};
+    const type = (metaInfo && metaInfo.contentType) || (metadata && metadata.contentType) || '';
     const src = metadata.downloadURL || '';
 
     onSubmit({
@@ -156,11 +157,13 @@ class PostNew extends React.Component {
 
     const { progress, metadata } = upload;
 
+    const metaInfo = (metadata.contentType && metadata) || (metadata.metadata.contentType && metadata.metadata) || {};
+
     const rows = hasFocus || content ? 6 : 3;
 
     return (
       <Form style={{ flex: 1 }}>
-        <Media style={{ flex: 1 }} media={[{ src: localURI, type: metadata.contentType }]} />
+        <Media style={{ flex: 1 }} media={[{ src: localURI, type: metaInfo.contentType }]} />
         {!!progress && <View style={{ flex: 1 }} className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>}
         <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ flex: 0.9 }}>

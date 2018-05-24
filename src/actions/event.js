@@ -15,7 +15,7 @@ export function showLoader() {
 export function listenToPosts(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
-  const ref = FirebaseRef.child(`events/${eventId}/posts`);
+  const ref = FirebaseRef.child(`live_posts/${eventId}`);
 
   return dispatch => new Promise(resolve =>
     ref.on('value', (snapshot) => {
@@ -33,7 +33,7 @@ export function listenToPosts(eventId) {
 export function listenToNotes(eventId) {
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
-  const ref = FirebaseRef.child(`events/${eventId}/notes`);
+  const ref = FirebaseRef.child(`hot_posts/${eventId}`);
 
   return dispatch => new Promise(resolve =>
     ref.on('value', (snapshot) => {
@@ -56,9 +56,10 @@ export function getPosts(addedData) {
 
   if (!eventId || Firebase === null) return () => new Promise(resolve => resolve());
 
-  const childType = postType === 'notes' ? postType : 'posts';
-  const ref = FirebaseRef.child(`events/${eventId}/${childType}`);
+  const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
   const ACTION_TYPE = postType === 'notes' ? 'NOTES_REPLACE' : 'POSTS_REPLACE';
+
+  const ref = FirebaseRef.child(`${childKey}/${eventId}`);
 
   return dispatch => new Promise((resolve, reject) =>
     ref.once('value')
@@ -90,8 +91,9 @@ export function addComment(commentData) {
   }
 
   return dispatch => new Promise((resolve, reject) => {
-    const childType = postType === 'notes' ? postType : 'posts';
-    const postRef = FirebaseRef.child(`events/${eventId}/${childType}/${postId}`);
+
+    const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+    const postRef = FirebaseRef.child(`${childKey}/${eventId}/${postId}`);
 
     const failureCallback = (e) => {
       console.log('failureCallback', e);
@@ -131,8 +133,8 @@ export function addPost(postData) {
   }
 
   return dispatch => new Promise((resolve, reject) => {
-    const childType = postType === 'notes' ? postType : 'posts';
-    const postsRef = FirebaseRef.child(`events/${eventId}/${childType}`);
+    const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+    const postsRef = FirebaseRef.child(`${childKey}/${eventId}`);
     const lastRef = postsRef.orderByKey().limitToLast(1);
 
     const failureCallback = (e) => {
@@ -180,8 +182,8 @@ export function toggleLike(likeData) {
     return () => new Promise(resolve => resolve());
   }
 
-  const childType = postType === 'notes' ? postType : 'posts';
-  const postRef = FirebaseRef.child(`events/${eventId}/${childType}/${postId}`);
+  const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
+  const postRef = FirebaseRef.child(`${childKey}/${eventId}/${postId}`);
 
   const pushToKey = (snapshot) => {
     const post = snapshot.val();

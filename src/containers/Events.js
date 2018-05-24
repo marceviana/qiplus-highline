@@ -46,6 +46,12 @@ class EventListing extends Component {
     } = this.props;
     const id = (match && match.params && match.params.id) ? match.params.id : null;
 
+    let userEvents = events.events || [];
+    userEvents = userEvents.filter(item =>
+      item && item.participants &&
+      member && member.id &&
+      item.participants[member.id]);
+
     return (
       <Layout
         eventId={id}
@@ -53,7 +59,7 @@ class EventListing extends Component {
         error={events.error}
         loader={events.loader}
         loading={events.loading}
-        events={events.events}
+        events={userEvents}
         member={member}
         reFetch={() => this.fetchEvents()}
         eventSetter={this.props.eventSetter}

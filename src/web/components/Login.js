@@ -55,7 +55,7 @@ class Login extends React.Component {
   handleSubmit = (event) => {
     event.preventDefault();
     this.props.onFormSubmit(this.state)
-      .then(() => this.props.history.push('/'))
+      .then(() => this.props.history.push('/events'))
       .catch(e => console.log(`Error: ${e}`));
   }
 
@@ -80,13 +80,13 @@ class Login extends React.Component {
                       type="email"
                       name="email"
                       id="email"
-                      placeholder="john@doe.corp"
+                      placeholder="seu@email.com"
                       value={this.state.email}
                       onChange={this.handleChange}
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="password">Password</Label>
+                    <Label for="password">Senha</Label>
                     <Input
                       type="password"
                       name="password"

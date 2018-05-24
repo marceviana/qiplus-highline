@@ -29,7 +29,7 @@ export const dateFormatter = (datetime, locale = 'pt') => {
 
 const EventView = (props) => {
   const {
-    locale,
+    member,
     location,
     currentUser,
     error,
@@ -57,9 +57,7 @@ const EventView = (props) => {
 
   const isPitch = location.pathname.indexOf('notes') >= 0;
 
-  const timeline = (!isPitch && (
-    (posts.length && posts) || event.posts
-  )) || ((notes.length && notes) || event.notes);
+  const timeline = isPitch ? notes : posts;
 
   const Avatar = ({ user, style }) => {
     if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>;
@@ -73,6 +71,15 @@ const EventView = (props) => {
     );
   };
 
+  Avatar.propTypes = {
+    user: PropTypes.number.isRequired,
+    style: PropTypes.any,
+  };
+
+  Avatar.defaultProps = {
+    style: {},
+  };
+
   const ActionLink = ({ action_link, deadline }) => (
     isPitch && action_link && 
     (!deadline || new Date(deadline).getTime() < new Date().getTime()) && (
@@ -80,6 +87,16 @@ const EventView = (props) => {
       <Timer href={action_link} deadline={deadline} />
     </CardFooter>
     )) || null;
+
+  ActionLink.propTypes = {
+    action_link: PropTypes.string,
+    deadline: PropTypes.string,
+  };
+
+  ActionLink.defaultProps = {
+    action_link: '',
+    deadline: '',
+  };
 
   const newComment = (post, content) => {
     addComment({
@@ -104,7 +121,7 @@ const EventView = (props) => {
     addPost({
       ...post,
       eventId,
-      username: wpUsers[currentUser].display_name,
+      username: member.display_name,
     });
   };
 
@@ -177,7 +194,7 @@ const EventView = (props) => {
       )}
       <CardBody style={styles.cardBody}>
         <Badge className="bg-qi" style={styles.dateTime}>{dateFormatter(post.datetime)}</Badge>
-        <Avatar style={styles.avatar} user={post.user} />
+        <Avatar style={styles.avatar} user={Number(post.user)} />
         <CardTitle style={styles.userName}>{post.username}</CardTitle>
         <CardText style={{ fontSize: 13 }}>
           <span dangerouslySetInnerHTML={{ __html: post.content }} />
@@ -247,6 +264,7 @@ EventView.propTypes = {
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
   event: PropTypes.shape().isRequired,
+  member: PropTypes.shape().isRequired,
   posts: PropTypes.arrayOf(PropTypes.shape()),
   notes: PropTypes.arrayOf(PropTypes.shape()),
   addComment: PropTypes.func.isRequired,
@@ -261,7 +279,7 @@ EventView.propTypes = {
 };
 
 EventView.defaultProps = {
-  currentUser: 1,
+  currentUser: 0,
   locale: null,
   error: null,
   location: {},

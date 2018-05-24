@@ -1,7 +1,6 @@
 import ErrorMessages from '../constants/errors';
 import statusMessage from './status';
 import { Firebase, FirebaseRef } from '../lib/firebase';
-import { getFileExt, getMediaType } from '../lib/functions';
 
 /**
   * Sign Up to Firebase
@@ -59,23 +58,37 @@ function getWPUserData(dispatch) {
 
   const wpUsersRef = FirebaseRef.child('wp_users');
 
-  return wpUsersRef.orderByChild('email').equalTo(email).once('value', (snapshot) => {
-    console.log(snapshot.val());
-    const userData = snapshot.val() || [];
-    console.log('userData', userData);
-    console.log('snapshot', snapshot);
+  return wpUsersRef.orderByChild('email').equalTo(email).on('value', (snapshot) => {
+    const results = snapshot.val() || [];
+    let userData = null;
 
-    return dispatch({
-      type: 'USER_DETAILS_UPDATE',
-      data: userData,
-    });
+    if (results && typeof results === 'object') {
+      if (!Array.isArray(results) && Object.keys(results).length) {
+        Object.keys(results).forEach((id) => {
+          if (id && results[id] && results[id].email === email) {
+            userData = results[id];
+          }
+        });
+      } else {
+        userData = results.find(item => item && item.email === email);
+      }
+    }
+
+    if (userData) {
+      return dispatch({
+        type: 'USER_DETAILS_UPDATE',
+        data: userData,
+      });
+    }
+
+    return false;
   });
 }
 
 /**
   * Get this User's Details
   */
-function getUserData() {
+function getUserData(dispatch) {
   const UID = (
     FirebaseRef
     && Firebase
@@ -84,18 +97,18 @@ function getUserData() {
     && Firebase.auth().currentUser.uid
   ) ? Firebase.auth().currentUser.uid : null;
 
-  if (!UID) return false;
-
   const ref = FirebaseRef.child(`users/${UID}`);
 
-  return dispatch => new Promise(resolve => ref.on('value', (snapshot) => {
+  return ref.on('value', (snapshot) => {
     const userData = snapshot.val() || [];
-    if (userData) {
-      return resolve(getWPUserData(dispatch));
-    }
 
-    return () => new Promise(() => resolve());
-  }));
+    dispatch({
+      type: 'USER_DETAILS_UPDATE',
+      data: userData,
+    });
+
+    return getWPUserData(dispatch);
+  });
 }
 
 export function getMemberData() {
@@ -124,6 +137,10 @@ export function login(formData) {
 
   return dispatch => new Promise(async (resolve, reject) => {
     await statusMessage(dispatch, 'loading', true);
+
+    dispatch({
+      type: 'USER_RESET',
+    });
 
     // Validation checks
     if (!email) return reject({ message: ErrorMessages.missingEmail });
@@ -251,135 +268,3 @@ export function logout() {
   }).catch(async (err) => { await statusMessage(dispatch, 'error', err.message); throw err.message; });
 }
 
-/**
-  * LoginWP
-  */
-// export function loginWP(formData) {
-//   const {
-//     email,
-//     password,
-//   } = formData;
-
-//   return dispatch => new Promise(async (resolve, reject) => {
-//     await statusMessage(dispatch, 'loading', true);
-
-//     // Validation checks
-//     if (!email) return reject({ message: ErrorMessages.missingEmail });
-//     if (!password) return reject({ message: ErrorMessages.missingPassword });
-
-//     const data = { action: 'app_login', username: email, password }; // wp ajax action
-
-//     $.ajax({
-//       type: 'GET', // this is the essence of jsonp
-//       url: APP_URL, // wp ajax url
-//       cache: false, // to ensure proper data response
-//       dataType: 'jsonp', // jsonp
-//       crossDomain: true, // enable ssl/nonssl
-//       data, // data to be sent
-//       success(dataJSON) => {
-//         const { conEstado } = dataJSON;
-
-//         if (Number(conEstado) === 1) {
-//           localStorage.setItem('conEstado', 1);
-
-//           dataJSON.user = email;
-//           dataJSON.pass = password;
-
-//           localJSON.set('meusdados', dataJSON);
-//           localStorage.setItem('userID', dataJSON.userID);
-//           localStorage.setItem('pp', pass);
-
-//           // console.log(dataJSON.user_avatar);
-//           let downloadAvatar = false;
-//           if (dataJSON.user_avatar && dataJSON.user_avatar.url) {
-//             downloadAvatar = true;
-//             const url = dataJSON.user_avatar.sizes.large
-//               ? dataJSON.user_avatar.sizes.large
-//               : dataJSON.user_avatar.url;
-//             const ext = getFileExt(url);
-//             const fileName = 'user_avatar' + '.' + ext;
-
-//             window.requestFileSystem(
-//               window.PERSISTENT,
-//               5 * 1024 * 1024,
-//               (fs) => {
-//                 const id = dataJSON.userID;
-//                 const tipo = 'usuarios';
-//                 const field = 'user_avatar';
-//                 const fileID = `image-${  tipo  }-id-${  id  }-field-${  field}`;
-
-//                 const fileData = {
-//                   id,
-//                   tipo,
-//                   field,
-//                   ext,
-//                   modified: dataJSON.user_avatar.modified,
-//                   url,
-//                   fileID,
-//                   fileName,
-//                   media: getMediaType(dataJSON.user_avatar.mime_type),
-//                   description: '',
-//                 };
-
-//                 downloadFile(
-//                   fs,
-//                   fileName,
-//                   url,
-//                   fileData,
-//                   (fileSrc) => {
-//                     localStorage.setItem('user_avatar', fileSrc);
-//                     login();
-//                   },
-//                   (src) => {
-//                     console.log('error-----AVATAR IMG');
-//                     console.log(src);
-//                     localStorage.setItem('user_avatar', '');
-//                     login();
-//                   },
-//                 );
-//               },
-//             );
-//           } else {
-//             localStorage.setItem('user_avatar', '');
-//           }
-
-//           if ('horarioIniStr' in dataJSON) {
-//             localStorage.setItem('horarioIniStr', dataJSON.horarioIniStr);
-//             localStorage.setItem('horarioFinStr', dataJSON.horarioFinStr);
-//           }
-
-//           if ('quemSomosStr' in dataJSON) {
-//             localStorage.setItem('quemSomosStr', dataJSON.quemSomosStr);
-//           }
-
-//           if ('ajaxurl' in dataJSON) {
-//             localStorage.setItem('ajaxurl', dataJSON.ajaxurl);
-//             ajaxurl = dataJSON.ajaxurl;
-//           }
-
-//           if ('all_fields' in dataJSON) {
-//             localJSON.set('all_fields', dataJSON.all_fields);
-//           }
-//           if ('extra_fields' in dataJSON) {
-//             localJSON.set('extra_fields', dataJSON.extra_fields);
-//           }
-//           if ('wpuser_fields' in dataJSON) {
-//             localJSON.set('wpuser_fields', dataJSON.wpuser_fields);
-//           }
-//           if ('indexed_fields' in dataJSON) {
-//             localJSON.set('indexed_fields', dataJSON.indexed_fields);
-//           }
-
-//           if (!downloadAvatar) login();
-//         } else if (conEstado == 0) {
-//           statusMessage(dispatch, 'error', 'Dados incorretos. Tente novamente.');
-//           localStorage.setItem('conEstado', 0);
-//         }
-//       },
-
-//     });
-//   }).catch(async (err) => {
-//     await statusMessage(dispatch, 'error', err.message);
-//     throw err.message;
-//   });
-// }

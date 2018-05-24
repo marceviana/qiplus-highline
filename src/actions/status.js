@@ -13,9 +13,15 @@ export default function (dispatch, type, val) {
     let message = val;
     if (!val) {
       if (type === 'success') message = 'Success';
-      if (type === 'error') message = 'Sorry, an error occurred';
-      if (type === 'info') message = 'Something is happening...';
+      if (type === 'error') message = 'Desculpe, ocorreu um erro';
+      if (type === 'info') message = 'Processando...';
       if (type === 'loading' && val !== false) message = true;
+    }
+
+    if (typeof message === 'string') {
+      if (message.indexOf('password is invalid')) {
+        message = 'Senha ou usuário inválidos';
+      }
     }
 
     return resolve(dispatch({

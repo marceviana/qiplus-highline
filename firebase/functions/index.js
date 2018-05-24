@@ -26,23 +26,24 @@ exports.upload = functions.https.onRequest(upload.handler);
   * Listens for updates to /users/:userId and creates an
   * full name attribute based on the first and last names
   */
-exports.cleanUserData = functions.database.ref('/users/{userId}').onWrite((event) => {
-  console.log('Making Full Name for UserID:', event.params.userId);
+exports.cleanUserData = functions.database.ref('/users/{userId}').onWrite(function(event) {
+  console.log('event:', event);
+  // console.log('Making Full Name for UserID:', event.params.userId);
 
-  // Get the first and last names
-  const firstName = event.data._newData.firstName || '';
-  const lastName = event.data._newData.lastName || '';
+  // // Get the first and last names
+  // const firstName = event.data._newData.firstName || '';
+  // const lastName = event.data._newData.lastName || '';
 
-  const userData = {
-    fullName: `${firstName} ${lastName}`,
-  };
+  // const userData = {
+  //   fullName: `${firstName} ${lastName}`,
+  // };
 
-  // Add Role if it doesn't already exist
-  if (event && event.data && event.data._data && !event.data._newData.role) {
-    userData.role = 'user';
-  }
+  // // Add Role if it doesn't already exist
+  // if (event && event.data && event.data._data && !event.data._newData.role) {
+  //   userData.role = 'user';
+  // }
 
-  return event.data.ref.update(userData);
+  // return event.data.ref.update(userData);
 });
 
 /**
