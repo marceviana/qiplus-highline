@@ -20,6 +20,9 @@ import EventsComponent from '../components/Events';
 import EventContainer from '../../containers/Event';
 import EventViewComponent from '../components/Event';
 
+import ParticipantsContainer from '../../containers/Participants';
+import ParticipantsViewComponent from '../components/Participants';
+
 import SignUpContainer from '../../containers/SignUp';
 import SignUpComponent from '../components/SignUp';
 
@@ -104,7 +107,15 @@ const Index = () => (
         )}
       />
       <Route
-        path="/event/:id"
+        path="/event/:id/participants"
+        render={props => (
+          <TemplateSidebar>
+            <ParticipantsContainer {...props} Layout={ParticipantsViewComponent} />
+          </TemplateSidebar>
+        )}
+      />
+      <Route
+        path="/event/:id/notes"
         render={props => (
           <TemplateSidebar>
             <EventContainer {...props} Layout={EventViewComponent} />
@@ -112,7 +123,7 @@ const Index = () => (
         )}
       />
       <Route
-        path="/event/:id/notes"
+        path="/event/:id"
         render={props => (
           <TemplateSidebar>
             <EventContainer {...props} Layout={EventViewComponent} />

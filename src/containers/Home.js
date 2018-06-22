@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { logout, getMemberData } from '../actions/member';
 
-class About extends Component {
+class Home extends Component {
   static propTypes = {
     locale: PropTypes.string,
     Layout: PropTypes.func.isRequired,
@@ -40,4 +40,4 @@ const mapDispatchToProps = {
   getMemberData,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(About);
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

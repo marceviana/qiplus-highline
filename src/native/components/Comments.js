@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 
 import { StyleSheet, View, Share } from 'react-native';
 import { Text, Form, CardItem, Button, Body, Textarea, Thumbnail, Badge, Left, Icon } from 'native-base';
-import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 import { translate } from '../../i18n';
+import Avatar from './Avatar';
 
 const styles = StyleSheet.create({
   iconButton: {
@@ -24,29 +23,11 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#999',
   },
+  avatarIcon: {
+    color: '#3b3b3b',
+    fontSize: 50,
+  },
 });
-
-const Avatar = ({ user, wpUsers, style }) => {
-  if (!wpUsers[user] || !wpUsers[user].avatar) return <Left style={style}><FontAwesomeIcon size={50} name="user-circle-o" /></Left>;
-  return (
-    <Left style={style}>
-      {
-        !!wpUsers[user] && wpUsers[user].avatar &&
-        <Thumbnail source={{ uri: wpUsers[user].avatar }} />
-      }
-    </Left>
-  );
-};
-
-Avatar.propTypes = {
-  user: PropTypes.number.isRequired,
-  wpUsers: PropTypes.shape().isRequired,
-  style: PropTypes.any,
-};
-
-Avatar.defaultProps = {
-  style: {},
-};
 
 const Counter = ({ count }) => {
   if (!Array.isArray(count) || !count.length) return null;
@@ -54,16 +35,16 @@ const Counter = ({ count }) => {
     <Badge
       primary
       style={{
-        height: 20,
-        width: 20,
-        borderRadius: 10,
+        height: 22,
+        width: 22,
+        borderRadius: 11,
         paddingHorizontal: 0,
         paddingVertical: 0,
         justifyContent: 'center',
         flexDirection: 'row',
       }}
     >
-      <Text style={{ fontSize: 10, lineHeight: 20, color: '#fff' }}>
+      <Text style={{ fontSize: 10, lineHeight: 22, color: '#fff' }}>
         {count.length.toString()}
       </Text>
     </Badge>
@@ -206,7 +187,7 @@ class Comments extends React.Component {
             onPress={() => this._share()}
             style={styles.iconButton}
           >
-            <SimpleLineIcon size={20} name="share" />
+            <Icon type="SimpleLineIcons" name="share" style={{ fontSize: 20 }} />
           </Button> */}
         </CardItem>
 
@@ -217,7 +198,9 @@ class Comments extends React.Component {
           if (!!isOpen && index < loaded) {
               return (
                 <CardItem style={{ position: 'relative' }} key={i}>
-                  <Avatar style={{ flex: 0.25, alignItems: 'flex-start' }} user={Number(user)} wpUsers={wpUsers} />
+                  <Left style={{ flex: 0.25, alignItems: 'flex-start' }}>
+                    <Avatar iconStyle={styles.avatarIcon} src={(wpUsers[Number(user)] && wpUsers[Number(user)].avatar) || ''} />
+                  </Left>
                   <Text style={styles.dateTime}>{dateFormatter(comment.datetime)}</Text>
                   <Body style={{ flex: 0.75 }}>
                     <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
@@ -248,7 +231,9 @@ class Comments extends React.Component {
         {(!!isOpen && !!post.comments && post.comments.length > loaded &&
           post.comments[post.comments.length - 1].user === currentUser &&
           <CardItem>
-            <Avatar style={{ flex: 0.25 }} user={currentUser} wpUsers={wpUsers} />
+            <Left style={{ flex: 0.25 }}>
+              <Avatar iconStyle={styles.avatarIcon} src={(wpUsers[currentUser] && wpUsers[currentUser].avatar) || ''} />
+            </Left>
             <Body style={{ flex: 0.75 }}>
               <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
                 {(!!wpUsers[currentUser] && wpUsers[currentUser].display_name) || ''}

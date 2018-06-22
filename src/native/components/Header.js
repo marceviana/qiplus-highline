@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text, H1 } from 'native-base';
 import Spacer from './Spacer';
+import Colors from '../../../native-base-theme/variables/commonColor';
 
 const Header = ({ title, content }) => (
   <View>
     <Spacer size={25} />
-    <H1>{title}</H1>
+    <H1 style={{ color: Colors.brandPrimary }}>{title}</H1>
     {(!!content && (
       <View>
         <Spacer size={10} />
@@ -25,7 +26,7 @@ Header.propTypes = {
 };
 
 Header.defaultProps = {
-  title: 'Missing title',
+  title: 'Live QI Plus',
   content: '',
 };
 

@@ -11,7 +11,7 @@ import { translate } from '../../i18n';
 import { uriToBlob } from '../../lib/functions';
 
 import Spacer from './Spacer';
-import { Media } from './Event';
+import Media from './Media';
 
 class PostNew extends React.Component {
   static propTypes = {
@@ -157,7 +157,7 @@ class PostNew extends React.Component {
 
     const { progress, metadata } = upload;
 
-    const metaInfo = (metadata.contentType && metadata) || (metadata.metadata.contentType && metadata.metadata) || {};
+    const metaInfo = metadata.metadata || (metadata && metadata.contentType ? metadata : {} );
 
     const rows = hasFocus || content ? 6 : 3;
 

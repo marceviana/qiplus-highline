@@ -3,22 +3,50 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { FlatList, RefreshControl, WebView, StyleSheet, View } from 'react-native';
+import { Container, Content, Card, CardItem, Body, H3, Text, Spinner } from 'native-base';
 
-import { Actions } from 'react-native-router-flux';
-import { Video } from 'expo';
-import { FlatList, RefreshControl, WebView, Image, StyleSheet, View } from 'react-native';
-import { Container, Content, Footer, FooterTab, Card, CardItem, Body, H3, Text, Button, Icon, Spinner, Thumbnail } from 'native-base';
 import Colors from '../../../native-base-theme/variables/commonColor';
 import ErrorMessages from '../../constants/errors';
+
+import EventFooter from './EventFooter';
 import Loading from './Loading';
 import Error from './Error';
 import Spacer from './Spacer';
 import Comments from './Comments';
 import PostNew from './PostNew';
-import Timer from './Timer';
+import Media from './Media';
+import Banner from './Banner';
+import Avatar from './Avatar';
+import ActionLink from './ActionLink';
 
 const styles = StyleSheet.create({
+  banner: {
+    height: 300,
+    width: null,
+    flex: 1,
+  },
+  avatarIcon: {
+    color: '#3b3b3b',
+    margin: 10,
+    fontSize: 60,
+  },
+  avatar: {
+    position: 'absolute',
+    left: 10,
+    top: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    zIndex: 2,
+    overflow: 'hidden',
+    borderRadius: 80,
+    width: 80,
+    height: 80,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
   pillWrapper: {
     position: 'absolute',
     top: 32,
@@ -38,36 +66,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     paddingLeft: 85,
     top: 0,
-  },
-  avatar: {
-    position: 'absolute',
-    left: 10,
-    top: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    zIndex: 2,
-    overflow: 'hidden',
-    borderRadius: 80,
-    width: 80,
-    height: 80,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-  },
-  avatarIcon: {
-    color: '#3b3b3b',
-    margin: 10,
-  },
-  avatarThumbnail: {
-    position: 'absolute',
-    left: 10,
-    top: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    zIndex: 2,
   },
   container: {
     position: 'relative',
@@ -97,36 +95,7 @@ const styles = StyleSheet.create({
     width: null,
     flex: 1,
   },
-  footerTab: {
-    backgroundColor: Colors.brandPrimary,
-  },
-  footerBtn: {
-    backgroundColor: Colors.brandPrimary,
-  },
-  footerText: {
-    color: '#fff',
-  },
-  footerIcon: {
-    color: '#fff',
-  },
 });
-
-export const Media = ({ media }) => (
-  (media && media[0] && media[0].src && (
-    media[0].type && media[0].type.indexOf('vid') >= 0 ?
-      <Video
-        source={{ uri: media[0].src }}
-        shouldPlay
-        resizeMode="cover"
-        style={styles.media}
-      />
-      :
-      <Image
-        source={{ uri: media[0].src }}
-        style={styles.media}
-      />
-  )) || <Text>{' '}</Text>
-);
 
 const EventView = (props) => {
   const {
@@ -146,6 +115,7 @@ const EventView = (props) => {
     wpUsers,
     posts,
     notes,
+    activeTab,
   } = props;
 
   // Loading
@@ -157,43 +127,9 @@ const EventView = (props) => {
   // event not found
   if (!event || !event.id) return <Error content={ErrorMessages.event404} />;
 
-  const isPitch = location.pathname && location.pathname.indexOf('notes') >= 0;
+  const hotPosts = activeTab == 'hotposts';
 
-  const timeline = isPitch ? notes : posts;
-
-  const Avatar = ({ user, style }) => {
-    if (!wpUsers[user] || !wpUsers[user].avatar) return <View style={style}><FontAwesomeIcon style={styles.avatarIcon} size={60} name="user-circle-o" /></View>;
-    return (
-      <Thumbnail large style={styles.avatarThumbnail} source={{ uri: wpUsers[user].avatar }} />
-    );
-  };
-
-  Avatar.propTypes = {
-    user: PropTypes.number.isRequired,
-    style: PropTypes.any,
-  };
-
-  Avatar.defaultProps = {
-    style: {},
-  };
-
-  const ActionLink = ({ action_link, deadline }) => (
-    isPitch && action_link &&
-    (!deadline || new Date(deadline).getTime() < new Date().getTime()) && (
-      <View style={{ fontSize: 13 }}>
-        <Timer href={action_link} deadline={deadline} />
-      </View>
-    )) || null;
-
-  ActionLink.propTypes = {
-    action_link: PropTypes.string,
-    deadline: PropTypes.string,
-  };
-
-  ActionLink.defaultProps = {
-    action_link: '',
-    deadline: '',
-  };
+  const timeline = hotPosts ? notes : posts;
 
   const newComment = (post, content) => {
     addComment({
@@ -201,7 +137,7 @@ const EventView = (props) => {
       content,
       eventId,
       postId: post.id,
-      postType: (isPitch ? 'notes' : 'post'),
+      postType: (hotPosts ? 'notes' : 'post'),
     });
   };
 
@@ -210,7 +146,7 @@ const EventView = (props) => {
       user: currentUser,
       eventId,
       postId: post.id,
-      postType: (isPitch ? 'notes' : 'post'),
+      postType: (hotPosts ? 'notes' : 'post'),
     });
   };
 
@@ -231,7 +167,7 @@ const EventView = (props) => {
 
   const keyExtractor = item => (item.id && item.id.toString()) || '';
 
-  let loaded = 10;
+  let loaded = 100;
 
   const loadMore = () => {
     loaded += 10;
@@ -240,16 +176,19 @@ const EventView = (props) => {
   return (
     <Container>
       <Content padder>
-        <Image source={{ uri: event.banner }} style={{ height: 200, width: null, flex: 1 }} />
-
+        <Banner
+          src={event.banner}
+          style={styles.banner}
+        />
         <Spacer size={25} />
         <H3>{event.title}</H3>
+        <H3>{activeTab}</H3>
         {!!event.organizers && event.organizers.length && <Text>{event.organizers.join(' & ')}</Text>}
 
         <Spacer size={10} />
         {!!event.description && <Text>{event.description}</Text>}
 
-        {(!isPitch && (
+        {(!hotPosts && (
           <Card>
             <CardItem>
               <PostNew
@@ -269,12 +208,17 @@ const EventView = (props) => {
 
         {!!timeline && !!timeline.length && <FlatList
           numColumns={1}
+          getItemLayout={(item, index) => {
+            const hasMedia = item.media && item.media[0] && item.media[0].src;
+            const itemHeight = hasMedia ? 600 : 300;
+            return { length: itemHeight, offset: itemHeight * index, index };
+          }}
           data={timeline.slice(0).reverse()}
           renderItem={({ item, index }) => {
             const hasMedia = item.media && item.media[0] && item.media[0].src;
             const containerStyle = hasMedia ?
-              { ...styles.container, borderRadius: 0 } :
-              styles.container;
+              { ...styles.container, marginTop: 30, borderRadius: 0 } :
+              { ...styles.container, marginTop: 30 };
             return (
             !!item.username && index < loaded &&
             <View style={containerStyle}>
@@ -282,7 +226,7 @@ const EventView = (props) => {
                 <Media media={item.media} />
               </View>
               <Card transparent style={styles.card}>
-                <Avatar style={styles.avatar} user={Number(item.user)} />
+                <Avatar style={styles.avatar} iconStyle={styles.avatarIcon} src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''} />
                 <View style={styles.pillWrapper}>
                   <Text note style={styles.dateTime}>{dateFormatter(item.datetime)}</Text>
                 </View>
@@ -294,9 +238,14 @@ const EventView = (props) => {
                 <CardItem cardBody style={styles.cardBody}>
                   <Body>
                     <Spacer size={10} />
-                    <WebView source={{ html: item.content }} />
+                    <Text>{item.content}</Text>
+                    {/*
+                    <WebView
+                      style={{ flex: 1, padding: 5, color: '#3b3b3b', height: 50 }}
+                      source={{ html: `<div>${item.content}</div>` }}
+                    /> */}
                     <Spacer size={15} />
-                    <ActionLink post={item} />
+                    {hotPosts && <ActionLink post={item} />}
                   </Body>
                 </CardItem>
                 <Comments
@@ -321,37 +270,8 @@ const EventView = (props) => {
 
       </Content>
 
-      <Footer>
-        <FooterTab style={styles.footerTab}>
-          <Button
-            style={!isPitch ? {...styles.footerBtn, backgroundColor: Colors.tabActiveBgColor } : {...styles.footerBtn }}
-            onPress={() => Actions.event({ location: { pathname: `/event/${eventId}/notes` }, match: { params: { id: String(eventId) } } })}
-            vertical
-            active={!isPitch}
-          >
-            <Icon style={styles.footerIcon} name="apps" />
-            <Text style={styles.footerText}>Live Posts</Text>
-          </Button>
-          <Button
-            style={isPitch ? {...styles.footerBtn, backgroundColor: Colors.tabActiveBgColor } : {...styles.footerBtn }}
-            onPress={() => Actions.event({ location: { pathname: `/event/${eventId}/notes` }, match: { params: { id: String(eventId), url: 'notes' } } })}
-            vertical
-            active={isPitch}
-          >
-            <Icon style={styles.footerIcon} name="flame" />
-            <Text style={styles.footerText}>Hot Posts</Text>
-          </Button>
-          <Button
-            style={false ? {...styles.footerBtn, backgroundColor: Colors.tabActiveBgColor } : {...styles.footerBtn }}
-            onPress={() => Actions.event({ location: { pathname: `/event/${eventId}/notes` }, match: { params: { id: String(eventId) } } })}
-            vertical
-            active={false}
-          >
-            <Icon style={styles.footerIcon} name="contacts" />
-            <Text style={styles.footerText}>Participantes</Text>
-          </Button>
-        </FooterTab>
-      </Footer>
+      <EventFooter eventId={eventId} activeTab={activeTab} />
+
     </Container>
   );
 };
@@ -360,6 +280,7 @@ EventView.propTypes = {
   upload: PropTypes.shape(),
   locale: PropTypes.string,
   location: PropTypes.shape(),
+  activeTab: PropTypes.string,
   error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   eventId: PropTypes.number.isRequired,
@@ -379,6 +300,7 @@ EventView.defaultProps = {
   currentUser: 0,
   locale: null,
   error: null,
+  activeTab: 'liveposts',
   location: {},
   posts: [],
   notes: [],

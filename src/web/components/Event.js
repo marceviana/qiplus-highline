@@ -19,6 +19,7 @@ import Comments from './Comments';
 import PostNew from './PostNew';
 import EventNavBar from './EventNavBar';
 import Timer from './Timer';
+import Avatar from './Avatar';
 
 export const dateFormatter = (datetime, locale = 'pt') => {
   if (!datetime) return '';
@@ -58,27 +59,6 @@ const EventView = (props) => {
   const isPitch = location.pathname.indexOf('notes') >= 0;
 
   const timeline = isPitch ? notes : posts;
-
-  const Avatar = ({ user, style }) => {
-    if (!wpUsers[user] || !wpUsers[user].avatar) return <div className="avatar-icon" style={style}><i className="icon-user" style={{ fontSize: 40 }} /></div>;
-    return (
-      <div style={style} className="avatar-img">
-        {
-          !!wpUsers[user] && wpUsers[user].avatar &&
-          <img alt="" src={wpUsers[user].avatar} />
-        }
-      </div>
-    );
-  };
-
-  Avatar.propTypes = {
-    user: PropTypes.number.isRequired,
-    style: PropTypes.any,
-  };
-
-  Avatar.defaultProps = {
-    style: {},
-  };
 
   const ActionLink = ({ action_link, deadline }) => (
     isPitch && action_link && 
@@ -130,6 +110,7 @@ const EventView = (props) => {
       position: 'absolute',
       top: 0,
       left: 0,
+      right: 0,
       zIndex: 1000,
     },
     mainCard: {
@@ -194,7 +175,7 @@ const EventView = (props) => {
       )}
       <CardBody style={styles.cardBody}>
         <Badge className="bg-qi" style={styles.dateTime}>{dateFormatter(post.datetime)}</Badge>
-        <Avatar style={styles.avatar} user={Number(post.user)} />
+        <Avatar style={styles.avatar} src={(wpUsers[Number(post.user)] && wpUsers[Number(post.user)].avatar) || ''} />
         <CardTitle style={styles.userName}>{post.username}</CardTitle>
         <CardText style={{ fontSize: 13 }}>
           <span dangerouslySetInnerHTML={{ __html: post.content }} />
@@ -253,6 +234,7 @@ const EventView = (props) => {
         pathname={location.pathname}
         postsLen={(posts && posts.length) || (event.posts && event.posts.length) || 0}
         notesLen={(notes && notes.length) || (event.notes && event.notes.length) || 0}
+        participantsLen={(event.participants && Object.keys(event.participants).length) || 0}
       />
     </div>
   );
@@ -272,7 +254,6 @@ EventView.propTypes = {
   likeFn: PropTypes.func.isRequired,
   uploadFn: PropTypes.func.isRequired,
   location: PropTypes.shape(),
-  participants: PropTypes.shape(),
   wpUsers: PropTypes.shape(),
   upload: PropTypes.shape(),
   currentUser: PropTypes.number,
@@ -284,7 +265,6 @@ EventView.defaultProps = {
   error: null,
   location: {},
   upload: {},
-  participants: {},
   posts: [],
   notes: [],
   wpUsers: {},

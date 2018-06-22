@@ -7,6 +7,7 @@
     "privacy": "public"
   },
   "android": {
+    "package": "live.qiplus",
     "permissions": [
       "CAMERA",
       "READ_INTERNAL_STORAGE",

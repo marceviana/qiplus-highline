@@ -9,19 +9,33 @@ import Error from './Error';
 import Header from './Header';
 import Spacer from './Spacer';
 
-const NoEvents = () => (
-  <View>
-    <Text style={{ fontSize: 35 }}>Ops...</Text>
-    <Spacer size={20} />
-    <Text style={{ fontSize: 22 }}>
-      Parece que você não está inscrito em nenuhum evento ativo no Live QI Plus
-    </Text>
-    <Spacer size={20} />
-    <Button primary onPress={() => Actions.home()}>
-      <Icon name="home" />
-      <Text style={{ fontSize: 18 }}>Voltar ao início</Text>
-    </Button>
-  </View>
+const NoEvents = ({ member }) => (
+    (!!member && !!member.email) ?
+    <View style={{ padding: 30 }}>
+      <Text style={{ fontSize: 28 }}>Ops...</Text>
+      <Spacer size={20} />
+      <Text style={{ fontSize: 18 }}>
+        Parece que você não está inscrito em nenuhum evento ativo no Live QI Plus
+      </Text>
+      <Spacer size={20} />
+      <Button primary onPress={() => Actions.home()}>
+        <Icon name="home" />
+        <Text style={{ fontSize: 18 }}>Voltar ao início</Text>
+      </Button>
+    </View>
+    :
+    <View>
+      <Spacer size={20} />
+      <Button block iconLeft onPress={() => Actions.login()} >
+        <Icon name="log-in" />
+        <Text>Fazer login no Live QI Plus</Text>
+      </Button>
+      <Spacer size={50} />
+      <Button block iconLeft onPress={() => Actions.signUp()} >
+        <Icon name="person-add" />
+        <Text>Criar uma conta no Live QI Plus</Text>
+      </Button>
+    </View>
 );
 
 const EventListing = ({
@@ -30,6 +44,7 @@ const EventListing = ({
   loader,
   locale,
   events,
+  member,
   reFetch,
   eventSetter,
 }) => {
@@ -43,7 +58,7 @@ const EventListing = ({
 
   const onPress = (item) => {
     eventSetter(item.id);
-    return Actions.event({ match: { params: { id: String(item.id) } } });
+    return Actions.liveposts({ match: { params: { id: String(item.id) } } });
   };
 
   return (
@@ -51,9 +66,12 @@ const EventListing = ({
       <Content padder>
         <Header
           title={translate('my_events_title', locale)}
-          content={translate('my_events_subtitle', locale)}
+          content={
+            (member && member.email && translate('my_events_subtitle', locale)) ||
+            ('Faça login ou crie uma conta no Live QI Plus para entrar em seus eventos')
+          }
         />
-        {!events.length && <NoEvents />}
+        {!events.length && <NoEvents member={member}/>}
         {loader && <Spinner color="blue" />}
         <FlatList
           numColumns={1}
@@ -110,6 +128,7 @@ EventListing.propTypes = {
   loading: PropTypes.bool.isRequired,
   loader: PropTypes.bool,
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  member: PropTypes.shape().isRequired,
   reFetch: PropTypes.func,
   eventSetter: PropTypes.func.isRequired,
 };

@@ -63,8 +63,7 @@ class UpdateProfile extends React.Component {
       <Container>
         <Content padder>
           <Header
-            title="Update my profile"
-            content="Thanks for keeping your account up to date!"
+            title="Atualizar meus dados"
           />
 
           {error && <Messages message={error} />}
@@ -72,7 +71,7 @@ class UpdateProfile extends React.Component {
 
           <Form>
             <Item stackedLabel>
-              <Label>First Name</Label>
+              <Label>Nome</Label>
               <Input
                 value={this.state.firstName}
                 onChangeText={v => this.handleChange('firstName', v)}
@@ -80,34 +79,22 @@ class UpdateProfile extends React.Component {
             </Item>
 
             <Item stackedLabel>
-              <Label>Last Name</Label>
+              <Label>Sobrenome</Label>
               <Input
                 value={this.state.lastName}
                 onChangeText={v => this.handleChange('lastName', v)}
               />
             </Item>
 
-            <ListItem>
-              <CheckBox
-                checked={this.state.changeEmail}
-                onPress={() => this.handleChange('changeEmail', !this.state.changeEmail)}
+            <Item stackedLabel>
+              <Label>Email</Label>
+              <Input
+                autoCapitalize="none"
+                value={this.state.email}
+                keyboardType="email-address"
+                onChangeText={v => this.handleChange('email', v)}
               />
-              <Body>
-                <Text>Change Email</Text>
-              </Body>
-            </ListItem>
-
-            {this.state.changeEmail &&
-              <Item stackedLabel>
-                <Label>Email</Label>
-                <Input
-                  autoCapitalize="none"
-                  value={this.state.email}
-                  keyboardType="email-address"
-                  onChangeText={v => this.handleChange('email', v)}
-                />
-              </Item>
-            }
+            </Item>
 
             <ListItem>
               <CheckBox
@@ -115,19 +102,19 @@ class UpdateProfile extends React.Component {
                 onPress={() => this.handleChange('changePassword', !this.state.changePassword)}
               />
               <Body>
-                <Text>Change Password</Text>
+                <Text>Mudar a senha</Text>
               </Body>
             </ListItem>
 
             {this.state.changePassword &&
               <View padder>
                 <Item stackedLabel>
-                  <Label>Password</Label>
+                  <Label>Senha</Label>
                   <Input secureTextEntry onChangeText={v => this.handleChange('password', v)} />
                 </Item>
 
                 <Item stackedLabel last>
-                  <Label>Confirm Password</Label>
+                  <Label>Redigitar Senha</Label>
                   <Input secureTextEntry onChangeText={v => this.handleChange('password2', v)} />
                 </Item>
               </View>
@@ -136,7 +123,7 @@ class UpdateProfile extends React.Component {
             <Spacer size={20} />
 
             <Button block onPress={this.handleSubmit}>
-              <Text>Update Profile</Text>
+              <Text>Atualizar meu dados</Text>
             </Button>
           </Form>
         </Content>

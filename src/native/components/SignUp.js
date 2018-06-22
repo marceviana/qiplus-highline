@@ -41,7 +41,7 @@ class SignUp extends React.Component {
 
   handleSubmit = () => {
     this.props.onFormSubmit(this.state)
-      .then(() => Actions.login())
+      .then(() => Actions.login({ from: 'signUp' }))
       .catch(e => console.log(`Error: ${e}`));
   }
 
@@ -54,20 +54,20 @@ class SignUp extends React.Component {
       <Container>
         <Content padder>
           <Header
-            title="Welcome"
-            content="We're glad to welcome you to the community. There's only a few questions and you'll be on your way."
+            title="Bem-vindo ao Live QI Plus"
+            content="Crie uma conta e comece a interagir com seus colegas de evento e organizadores"
           />
 
           {error && <Messages message={error} />}
 
           <Form>
             <Item stackedLabel>
-              <Label>First Name</Label>
+              <Label>Nome</Label>
               <Input onChangeText={v => this.handleChange('firstName', v)} />
             </Item>
 
             <Item stackedLabel>
-              <Label>Last Name</Label>
+              <Label>Sobrenome</Label>
               <Input onChangeText={v => this.handleChange('lastName', v)} />
             </Item>
 
@@ -81,19 +81,19 @@ class SignUp extends React.Component {
             </Item>
 
             <Item stackedLabel>
-              <Label>Password</Label>
+              <Label>Senha</Label>
               <Input secureTextEntry onChangeText={v => this.handleChange('password', v)} />
             </Item>
 
             <Item stackedLabel>
-              <Label>Confirm Password</Label>
+              <Label>Redigite a Senha</Label>
               <Input secureTextEntry onChangeText={v => this.handleChange('password2', v)} />
             </Item>
 
             <Spacer size={20} />
 
             <Button block onPress={this.handleSubmit}>
-              <Text>Sign Up</Text>
+              <Text>Criar uma conta no Live QI Plus</Text>
             </Button>
           </Form>
         </Content>

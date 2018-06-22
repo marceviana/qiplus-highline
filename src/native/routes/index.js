@@ -13,6 +13,9 @@ import EventsComponent from '../components/Events';
 import EventContainer from '../../containers/Event';
 import EventViewComponent from '../components/Event';
 
+import ParticipantsContainer from '../../containers/Participants';
+import ParticipantsViewComponent from '../components/Participants';
+
 import SignUpContainer from '../../containers/SignUp';
 import SignUpComponent from '../components/SignUp';
 
@@ -31,7 +34,7 @@ import UpdateProfileComponent from '../components/UpdateProfile';
 import MemberContainer from '../../containers/Member';
 import ProfileComponent from '../components/Profile';
 
-import HomeContainer from '../../containers/Home';
+// import HomeContainer from '../../containers/Home';
 import AboutComponent from '../components/About';
 
 const Index = (
@@ -39,11 +42,11 @@ const Index = (
     <Scene hideNavBar>
       <Stack
         key="home"
-        title={AppConfig.appName.toUpperCase()}
+        title={AppConfig.appName}
         icon={() => <Icon name="planet" {...DefaultProps.icons} />}
         {...DefaultProps.navbarProps}
       >
-        <Scene key="home" component={HomeContainer} Layout={AboutComponent} />
+        <Scene key="home" component={AboutComponent} />
       </Stack>
 
       <Stack
@@ -56,10 +59,28 @@ const Index = (
         <Scene
           back
           clone
-          key="event"
-          title={translate('event', locale)}
+          key="liveposts"
+          title={translate('liveposts', locale)}
           component={EventContainer}
           Layout={EventViewComponent}
+          {...DefaultProps.navbarProps}
+        />
+        <Scene
+          back
+          clone
+          key="hotposts"
+          title={translate('hotposts', locale)}
+          component={EventContainer}
+          Layout={EventViewComponent}
+          {...DefaultProps.navbarProps}
+        />
+        <Scene
+          back
+          clone
+          key="participants"
+          title={translate('participants', locale)}
+          component={ParticipantsContainer}
+          Layout={ParticipantsViewComponent}
           {...DefaultProps.navbarProps}
         />
       </Stack>

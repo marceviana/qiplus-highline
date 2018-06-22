@@ -91,7 +91,6 @@ export function addComment(commentData) {
   }
 
   return dispatch => new Promise((resolve, reject) => {
-
     const childKey = postType === 'notes' ? 'hot_posts' : 'live_posts';
     const postRef = FirebaseRef.child(`${childKey}/${eventId}/${postId}`);
 

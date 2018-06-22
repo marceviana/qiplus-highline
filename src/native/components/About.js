@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { StyleSheet, View, Image } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { Container, Content, Text, Icon, Button } from 'native-base';
@@ -16,7 +15,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const About = ({ member, logout }) => (
+const About = () => (
   <Container style={styles.homeContainer}>
     <Content>
       <Image
@@ -24,40 +23,14 @@ const About = ({ member, logout }) => (
         style={{ height: 400, width: null, flex: 1 }}
       />
       <Spacer size={30} />
-      {(member && member.email) ?
-        (<View style={styles.homeWrapper}>
-          <Button onPress={() => Actions.events()} >
-            <Icon name="calendar" />
-            <Text>Ver meus eventos no Live QI Plus</Text>
-          </Button>
-          <Button onPress={() => logout()} >
-            <Icon name="calendar" />
-            <Text>Logout</Text>
-          </Button>
-        </View>)
-        :
-        (<View style={styles.homeWrapper}>
-          <Button onPress={() => Actions.login()} >
-            <Icon name="calendar" />
-            <Text>Fazer login no Live QI Plus</Text>
-          </Button>
-          <Button onPress={() => Actions.signUp()} >
-            <Icon name="calendar" />
-            <Text>Criar uma conta no Live QI Plus</Text>
-          </Button>
-        </View>)
-      }
+      <View style={styles.homeWrapper}>
+        <Button onPress={() => Actions.events()} >
+          <Icon name="calendar" />
+          <View><Text>Ver meus eventos no Live QI Plus</Text></View>
+        </Button>
+      </View>
     </Content>
   </Container>
 );
-
-About.propTypes = {
-  member: PropTypes.shape({}),
-  logout: PropTypes.func.isRequired,
-};
-
-About.defaultProps = {
-  member: {},
-};
 
 export default About;
