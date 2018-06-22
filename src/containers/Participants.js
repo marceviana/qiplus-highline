@@ -34,7 +34,7 @@ class ParticipantsListing extends Component {
 
     componentDidMount = () => {
       const { event } = this.props.event;
-      this.fetchUsers(Object.keys(event.participants));
+      setTimeout(()=>this.fetchUsers(Object.keys(event.participants)), 1500)
     };
 
     fetchUsers = participantIds => this.props.getParticipants(participantIds)

@@ -9,6 +9,7 @@ import { Container, Content, Card, CardItem, Body, H3, Text, Spinner } from 'nat
 import Colors from '../../../native-base-theme/variables/commonColor';
 import ErrorMessages from '../../constants/errors';
 
+import EventHeader from './EventHeader';
 import EventFooter from './EventFooter';
 import Loading from './Loading';
 import Error from './Error';
@@ -16,16 +17,10 @@ import Spacer from './Spacer';
 import Comments from './Comments';
 import PostNew from './PostNew';
 import Media from './Media';
-import Banner from './Banner';
 import Avatar from './Avatar';
 import ActionLink from './ActionLink';
 
 const styles = StyleSheet.create({
-  banner: {
-    height: 300,
-    width: null,
-    flex: 1,
-  },
   avatarIcon: {
     color: '#3b3b3b',
     margin: 10,
@@ -175,99 +170,97 @@ const EventView = (props) => {
 
   return (
     <Container>
-      <Content padder>
-        <Banner
-          src={event.banner}
-          style={styles.banner}
-        />
-        <Spacer size={25} />
-        <H3>{event.title}</H3>
-        <H3>{activeTab}</H3>
-        {!!event.organizers && event.organizers.length && <Text>{event.organizers.join(' & ')}</Text>}
+      <Content>
+        <EventHeader event={event} />
+        <View style={{ padding: 10 }}>
+          <H3>{event.title}</H3>
+          {!!event.organizers && event.organizers.length && <Text>{event.organizers.join(' & ')}</Text>}
 
-        <Spacer size={10} />
-        {!!event.description && <Text>{event.description}</Text>}
+          <Spacer size={10} />
+          {!!event.description && <Text>{event.description}</Text>}
 
-        {(!hotPosts && (
-          <Card>
-            <CardItem>
-              <PostNew
-                upload={upload}
-                user={currentUser}
-                eventId={eventId}
-                onSubmit={newPost}
-                uploadFn={uploadFn}
-                {...props}
-              />
-            </CardItem>
-          </Card>
-         )) || null}
-
-        <Spacer size={20} />
-        {!!loading && <Spinner color={Colors.brandPrimary} />}
-
-        {!!timeline && !!timeline.length && <FlatList
-          numColumns={1}
-          getItemLayout={(item, index) => {
-            const hasMedia = item.media && item.media[0] && item.media[0].src;
-            const itemHeight = hasMedia ? 600 : 300;
-            return { length: itemHeight, offset: itemHeight * index, index };
-          }}
-          data={timeline.slice(0).reverse()}
-          renderItem={({ item, index }) => {
-            const hasMedia = item.media && item.media[0] && item.media[0].src;
-            const containerStyle = hasMedia ?
-              { ...styles.container, marginTop: 30, borderRadius: 0 } :
-              { ...styles.container, marginTop: 30 };
-            return (
-            !!item.username && index < loaded &&
-            <View style={containerStyle}>
-              <View style={styles.mediaWrapper}>
-                <Media media={item.media} />
-              </View>
-              <Card transparent style={styles.card}>
-                <Avatar style={styles.avatar} iconStyle={styles.avatarIcon} src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''} />
-                <View style={styles.pillWrapper}>
-                  <Text note style={styles.dateTime}>{dateFormatter(item.datetime)}</Text>
-                </View>
-                <CardItem>
-                  <Body style={styles.userName}>
-                    <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
-                  </Body>
-                </CardItem>
-                <CardItem cardBody style={styles.cardBody}>
-                  <Body>
-                    <Spacer size={10} />
-                    <Text>{item.content}</Text>
-                    {/*
-                    <WebView
-                      style={{ flex: 1, padding: 5, color: '#3b3b3b', height: 50 }}
-                      source={{ html: `<div>${item.content}</div>` }}
-                    /> */}
-                    <Spacer size={15} />
-                    {hotPosts && <ActionLink post={item} />}
-                  </Body>
-                </CardItem>
-                <Comments
-                  wpUsers={wpUsers}
-                  currentUser={currentUser}
-                  post={item}
-                  onSubmit={newComment}
-                  onLike={toggleLike}
-                  dateFormatter={dateFormatter}
+          {(!hotPosts && (
+            <Card>
+              <CardItem>
+                <PostNew
+                  upload={upload}
+                  user={currentUser}
+                  eventId={eventId}
+                  onSubmit={newPost}
+                  uploadFn={uploadFn}
                   {...props}
                 />
-              </Card>
-              <Spacer size={60} />
-            </View>
-          )}}
-          keyExtractor={keyExtractor}
-          onEndReached={loadMore}
-          onEndReachedThreshold={1}
-        /> }
+              </CardItem>
+            </Card>
+          )) || null}
 
-        <Spacer size={20} />
+          <Spacer size={20} />
+          {!!loading && <Spinner color={Colors.brandPrimary} />}
 
+          {!!timeline && !!timeline.length && <FlatList
+            numColumns={1}
+            getItemLayout={(item, index) => {
+              const hasMedia = item.media && item.media[0] && item.media[0].src;
+              const itemHeight = hasMedia ? 600 : 300;
+              return { length: itemHeight, offset: itemHeight * index, index };
+            }}
+            data={timeline.slice(0).reverse()}
+            renderItem={({ item, index }) => {
+              const hasMedia = item.media && item.media[0] && item.media[0].src;
+              const containerStyle = hasMedia ?
+                { ...styles.container, marginTop: 30, borderRadius: 0 } :
+                { ...styles.container, marginTop: 30 };
+              return (
+              !!item.username && index < loaded &&
+              <View style={containerStyle}>
+                <View style={styles.mediaWrapper}>
+                  <Media media={item.media} />
+                </View>
+                <Card transparent style={styles.card}>
+                  <Avatar style={styles.avatar} iconStyle={styles.avatarIcon} src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''} />
+                  <View style={styles.pillWrapper}>
+                    <Text note style={styles.dateTime}>{dateFormatter(item.datetime)}</Text>
+                  </View>
+                  <CardItem>
+                    <Body style={styles.userName}>
+                      <Text style={{ fontWeight: 'bold' }}>{item.username}</Text>
+                    </Body>
+                  </CardItem>
+                  <CardItem cardBody style={styles.cardBody}>
+                    <Body>
+                      <Spacer size={10} />
+                      <Text>{item.content}</Text>
+                      {/*
+                      <WebView
+                        style={{ flex: 1, padding: 5, color: '#3b3b3b', height: 50 }}
+                        source={{ html: `<div>${item.content}</div>` }}
+                      /> */}
+                      <Spacer size={15} />
+                      {hotPosts && <ActionLink post={item} />}
+                    </Body>
+                  </CardItem>
+                  <Comments
+                    wpUsers={wpUsers}
+                    currentUser={currentUser}
+                    post={item}
+                    onSubmit={newComment}
+                    onLike={toggleLike}
+                    dateFormatter={dateFormatter}
+                    {...props}
+                  />
+                </Card>
+                <Spacer size={60} />
+              </View>
+            )}}
+            keyExtractor={keyExtractor}
+            onEndReached={loadMore}
+            onEndReachedThreshold={1}
+          /> }
+
+          <Spacer size={20} />
+          
+        </View>
+        
       </Content>
 
       <EventFooter eventId={eventId} activeTab={activeTab} />

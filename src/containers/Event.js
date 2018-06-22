@@ -71,9 +71,11 @@ class EventView extends Component {
   componentDidMount = () => {
     const { event } = this.props.event;
     const { posts, notes } = this.props;
-    this.props.listenToPosts(extractId(event));
-    this.props.listenToNotes(extractId(event));
-    this.fetchUsers(extractParticipantIds({ posts, notes }));
+    setTimeout(()=>{
+      this.fetchUsers(extractParticipantIds({ posts, notes }))
+      // .then(this.props.listenToPosts(extractId(event)))
+      // .then(this.props.listenToNotes(extractId(event)))
+    }, 1500)
   };
 
   newComment = commentData =>

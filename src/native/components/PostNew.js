@@ -163,7 +163,7 @@ class PostNew extends React.Component {
 
     return (
       <Form style={{ flex: 1 }}>
-        <Media style={{ flex: 1 }} media={[{ src: localURI, type: metaInfo.contentType }]} />
+        {!!localURI && <Media style={{ flex: 1 }} media={[{ src: localURI, type: metaInfo.contentType }]} />}
         {!!progress && <View style={{ flex: 1 }} className="upload-progress"><Text style={{ width: `${progress}%` }} >{' '}</Text></View>}
         <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ flex: 0.9 }}>

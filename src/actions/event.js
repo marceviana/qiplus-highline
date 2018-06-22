@@ -237,7 +237,8 @@ export function getParticipants(participantIds) {
   if (Firebase === null) return () => new Promise(resolve => resolve());
 
   return dispatch => new Promise(resolve => FirebaseRef.child('wp_users')
-    .orderByKey()
+    .orderByChild('first_name')
+    .limitToFirst(20)
     .on('value', (snapshot) => {
       const results = snapshot.val() || [];
       const wpUsers = {};
