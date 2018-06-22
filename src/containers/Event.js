@@ -73,8 +73,8 @@ class EventView extends Component {
     const { posts, notes } = this.props;
     setTimeout(()=>{
       this.fetchUsers(extractParticipantIds({ posts, notes }))
-      // .then(this.props.listenToPosts(extractId(event)))
-      // .then(this.props.listenToNotes(extractId(event)))
+      .then(this.props.listenToPosts(extractId(event)))
+      .then(this.props.listenToNotes(extractId(event)))
     }, 1500)
   };
 
@@ -115,8 +115,8 @@ class EventView extends Component {
         activeTab={tab}
         upload={upload}
         locale={locale}
-        posts={posts}
-        notes={notes}
+        posts={[]}
+        notes={[]}
         error={event.error}
         loading={event.loading}
         loadingData={event.loadingData}
