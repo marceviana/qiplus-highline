@@ -40,7 +40,7 @@ const EventFooter = ({ eventId, activeTab }) => {
           vertical
           active={livePosts}
         >
-          <Icon style={styles.footerIcon} name="apps" />
+          <Icon style={styles.footerIcon} type="Ionicons" name="apps" />
           <Text style={styles.footerText}>Live Posts</Text>
         </Button>
         <Button
@@ -54,7 +54,7 @@ const EventFooter = ({ eventId, activeTab }) => {
           vertical
           active={hotPosts}
         >
-          <Icon style={styles.footerIcon} name="flame" />
+          <Icon style={styles.footerIcon} type="Ionicons" name="flame" />
           <Text style={styles.footerText}>Hot Posts</Text>
         </Button>
         <Button
@@ -68,7 +68,7 @@ const EventFooter = ({ eventId, activeTab }) => {
           vertical
           active={isParticipants}
         >
-          <Icon style={styles.footerIcon} name="contacts" />
+          <Icon style={styles.footerIcon} type="Ionicons" name="contacts" />
           <Text style={styles.footerText}>Participantes</Text>
         </Button>
       </FooterTab>

@@ -34,7 +34,7 @@ class ParticipantsListing extends Component {
 
     componentDidMount = () => {
       const { event } = this.props.event;
-      setTimeout(()=>this.fetchUsers(Object.keys(event.participants)), 1500)
+      setTimeout(() => this.fetchUsers(Object.keys(event.participants)), 1500)
     };
 
     fetchUsers = participantIds => this.props.getParticipants(participantIds)
@@ -63,10 +63,10 @@ class ParticipantsListing extends Component {
           loader={event.loader}
           loading={event.loading}
           reFetch={() => this.fetchUsers(Object.keys(event.participants))}
-          
+
           member={member}
           wpUsers={event.wpUsers}
-          
+
         />
       );
     }

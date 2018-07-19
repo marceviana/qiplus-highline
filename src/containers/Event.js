@@ -31,7 +31,9 @@ class EventView extends Component {
       event: PropTypes.shape().isRequired,
     }).isRequired,
     match: PropTypes.shape({
-      params: PropTypes.shape({}),
+      params: PropTypes.shape({
+        tab: '',
+      }),
     }),
     upload: PropTypes.shape({
       uploading: PropTypes.bool,
@@ -69,13 +71,14 @@ class EventView extends Component {
   }
 
   componentDidMount = () => {
-    const { event } = this.props.event;
-    const { posts, notes } = this.props;
-    setTimeout(()=>{
+    const { event, listening } = this.props.event;
+    setTimeout(() => {
+      const { posts, notes } = this.props;
       this.fetchUsers(extractParticipantIds({ posts, notes }))
-      .then(this.props.listenToPosts(extractId(event)))
-      .then(this.props.listenToNotes(extractId(event)))
-    }, 1500)
+        .then(this.props.match.params.tab === 'hotposts' ? 
+          this.props.listenToNotes(extractId(event)) :
+          this.props.listenToPosts(extractId(event)));
+    }, 500);
   };
 
   newComment = commentData =>
@@ -115,9 +118,10 @@ class EventView extends Component {
         activeTab={tab}
         upload={upload}
         locale={locale}
-        posts={[]}
-        notes={[]}
+        posts={(Array.isArray(posts) && posts) || []}
+        notes={(Array.isArray(notes) && notes) || []}
         error={event.error}
+        listening={event.listening}
         loading={event.loading}
         loadingData={event.loadingData}
         member={member}

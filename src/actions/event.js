@@ -23,6 +23,11 @@ export function listenToPosts(eventId) {
 
       // console.log('posts', posts);
 
+      dispatch({
+        type: 'POSTS_ON',
+        data: '',
+      });
+
       return resolve(dispatch({
         type: 'POSTS_REPLACE',
         data: posts,

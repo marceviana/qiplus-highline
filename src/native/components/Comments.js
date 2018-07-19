@@ -27,6 +27,17 @@ const styles = StyleSheet.create({
     color: '#3b3b3b',
     fontSize: 50,
   },
+  avatarThumbnail: {
+    width: 55,
+    height: 55,
+  },
+  avatar: {
+    flex: 1,
+    marginVertical: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+  },
 });
 
 const Counter = ({ count }) => {
@@ -44,7 +55,7 @@ const Counter = ({ count }) => {
         flexDirection: 'row',
       }}
     >
-      <Text style={{ fontSize: 10, lineHeight: 22, color: '#fff' }}>
+      <Text style={{ fontSize: 10, lineHeight: 15, color: '#fff' }}>
         {count.length.toString()}
       </Text>
     </Badge>
@@ -199,7 +210,12 @@ class Comments extends React.Component {
               return (
                 <CardItem style={{ position: 'relative' }} key={i}>
                   <Left style={{ flex: 0.25, alignItems: 'flex-start' }}>
-                    <Avatar iconStyle={styles.avatarIcon} src={(wpUsers[Number(user)] && wpUsers[Number(user)].avatar) || ''} />
+                    <Avatar
+                      style={styles.avatar}
+                      thumbStyle={styles.avatarThumbnail}
+                      iconStyle={styles.avatarIcon}
+                      src={(wpUsers[Number(user)] && wpUsers[Number(user)].avatar) || ''} 
+                    />
                   </Left>
                   <Text style={styles.dateTime}>{dateFormatter(comment.datetime)}</Text>
                   <Body style={{ flex: 0.75 }}>
@@ -232,7 +248,12 @@ class Comments extends React.Component {
           post.comments[post.comments.length - 1].user === currentUser &&
           <CardItem>
             <Left style={{ flex: 0.25 }}>
-              <Avatar iconStyle={styles.avatarIcon} src={(wpUsers[currentUser] && wpUsers[currentUser].avatar) || ''} />
+              <Avatar
+                style={styles.avatar}
+                thumbStyle={styles.avatarThumbnail}
+                iconStyle={styles.avatarIcon}
+                src={(wpUsers[currentUser] && wpUsers[currentUser].avatar) || ''} 
+              />
             </Left>
             <Body style={{ flex: 0.75 }}>
               <Text style={{ fontSize: 14, fontWeight: 'bold' }}>

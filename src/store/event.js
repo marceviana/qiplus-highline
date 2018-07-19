@@ -1,5 +1,6 @@
 export default {
   loading: true,
+  listening: false,
   loader: false,
   error: null,
   upload: {

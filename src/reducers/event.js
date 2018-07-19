@@ -44,6 +44,12 @@ export default function eventSingleReducer(state = initialState, action) {
         loadingData: false,
       };
     }
+    case 'POSTS_ON': {
+      return {
+        ...state,
+        listening: true,
+      };
+    }
     case 'POSTS_FETCHING': {
       return {
         ...state,

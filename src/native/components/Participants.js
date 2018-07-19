@@ -17,8 +17,13 @@ import Avatar from './Avatar';
 const styles = StyleSheet.create({
   avatarIcon: {
     color: '#3b3b3b',
-    fontSize: 40,
-    width: 40,    
+    fontSize: 45,
+    width: 50,
+  },
+  avatarThumbnail: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   pillWrapper: {
     position: 'absolute',
@@ -34,7 +39,6 @@ const styles = StyleSheet.create({
 
 const ParticipantsListing = (props) => {
   const {
-    location,
     currentUser,
     error,
     loading,
@@ -77,7 +81,7 @@ const ParticipantsListing = (props) => {
             { participants.map(user => (
               <ListItem avatar key={`${user.ID}`}>
                 <Left>
-                  <Avatar style={{ width: 50 }} iconStyle={styles.avatarIcon} src={(wpUsers[Number(user.user)] && wpUsers[Number(user.user)].avatar) || ''} />
+                  <Avatar style={{ width: 50 }} thumbStyle={styles.avatarThumbnail} iconStyle={styles.avatarIcon} src={ user.avatar || ''} />
                 </Left>
                 <Body>
                   <Text>{user.first_name}</Text>
@@ -93,7 +97,7 @@ const ParticipantsListing = (props) => {
           <Spacer size={20} />
 
         </View>
-        
+
       </Content>
 
       <EventFooter eventId={eventId} activeTab={activeTab} />
@@ -103,7 +107,6 @@ const ParticipantsListing = (props) => {
 };
 
 ParticipantsListing.propTypes = {
-  location: PropTypes.shape(),
   error: PropTypes.string,
   activeTab: PropTypes.string,
   loading: PropTypes.bool.isRequired,
@@ -118,7 +121,6 @@ ParticipantsListing.defaultProps = {
   currentUser: 0,
   error: null,
   activeTab: 'participants',
-  location: {},
   wpUsers: {},
 };
 

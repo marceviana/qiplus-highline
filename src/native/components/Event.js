@@ -26,6 +26,15 @@ const styles = StyleSheet.create({
     margin: 10,
     fontSize: 60,
   },
+  avatarThumbnail: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    left: 10,
+    top: 0,
+    zIndex: 2,
+  },
   avatar: {
     position: 'absolute',
     left: 10,
@@ -217,7 +226,12 @@ const EventView = (props) => {
                   <Media media={item.media} />
                 </View>
                 <Card transparent style={styles.card}>
-                  <Avatar style={styles.avatar} iconStyle={styles.avatarIcon} src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''} />
+                  <Avatar 
+                    style={styles.avatar}
+                    iconStyle={styles.avatarIcon}
+                    thumbStyle={styles.avatarThumbnail}
+                    src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''} 
+                  />
                   <View style={styles.pillWrapper}>
                     <Text note style={styles.dateTime}>{dateFormatter(item.datetime)}</Text>
                   </View>
@@ -249,7 +263,7 @@ const EventView = (props) => {
                     {...props}
                   />
                 </Card>
-                <Spacer size={60} />
+                <Spacer size={30} />
               </View>
             )}}
             keyExtractor={keyExtractor}
