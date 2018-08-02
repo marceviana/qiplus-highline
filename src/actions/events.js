@@ -61,5 +61,7 @@ export function getEvents() {
         type: 'EVENTS_REPLACE',
         data: events,
       }));
-    })).catch(e => console.log(e));
+    })).catch(e => {
+      // console.log(e)
+  });
 }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { listenToPosts, listenToNotes, getParticipants, setParticipantsError, addComment, addPost, getPosts, uploadFile, toggleLike } from '../actions/event';
+import {withNavigation} from "react-navigation";
 
 const extractParticipantIds = ({ posts, notes }) => {
   let users = [];
@@ -72,14 +73,12 @@ class EventView extends Component {
 
   componentDidMount = () => {
     const { event, listening } = this.props.event;
-    setTimeout(() => {
-      const { posts, notes } = this.props;
-      this.fetchUsers(extractParticipantIds({ posts, notes }))
-        .then(this.props.match.params.tab === 'hotposts' ? 
-          this.props.listenToNotes(extractId(event)) :
-          this.props.listenToPosts(extractId(event)));
-    }, 500);
-  };
+    const { posts, notes } = this.props;
+    this.fetchUsers(extractParticipantIds({ posts, notes }))
+      .then(this.props.navigation.state.route === 'HotPosts' ?
+        this.props.listenToNotes(extractId(event)) :
+        this.props.listenToPosts(extractId(event)));
+  }
 
   newComment = commentData =>
     this.props.addComment(commentData)
@@ -99,7 +98,7 @@ class EventView extends Component {
   fetchUsers = participantIds => this.props.getParticipants(participantIds)
     .then()
     .catch((err) => {
-      console.log(`Error: ${err}`);
+      // console.log(`Error: ${err}`);
       return this.props.setParticipantsError(err);
     })
 
@@ -156,4 +155,4 @@ const mapDispatchToProps = {
   setParticipantsError,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventView);
+export default connect(mapStateToProps, mapDispatchToProps)(withNavigation(EventView));

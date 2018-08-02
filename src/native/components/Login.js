@@ -45,8 +45,10 @@ class Login extends React.Component {
 
   handleSubmit = () => {
     this.props.onFormSubmit(this.state)
-      .then(() => Actions.events())
-      .catch(e => console.log(`Error: ${e}`));
+      .then(() => this.props.navigation.navigate('Home'))
+      .catch(e => {
+        console.log(`Error: ${e}`)
+      });
   }
 
   render() {

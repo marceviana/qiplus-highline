@@ -34,13 +34,13 @@ class ParticipantsListing extends Component {
 
     componentDidMount = () => {
       const { event } = this.props.event;
-      setTimeout(() => this.fetchUsers(Object.keys(event.participants)), 1500)
+      this.fetchUsers(Object.keys(event.participants))
     };
 
     fetchUsers = participantIds => this.props.getParticipants(participantIds)
       .then()
       .catch((err) => {
-        console.log(`Error: ${err}`);
+        // console.log(`Error: ${err}`);
         return this.props.setParticipantsError(err);
       })
 

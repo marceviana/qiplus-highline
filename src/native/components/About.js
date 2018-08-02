@@ -3,6 +3,7 @@ import { StyleSheet, View, Image } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { Container, Content, Text, Icon, Button } from 'native-base';
 import Spacer from './Spacer';
+import {withNavigation} from "react-navigation";
 
 const styles = StyleSheet.create({
   homeContainer: {
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const About = () => (
+const About = (props) => (
   <Container style={styles.homeContainer}>
     <Content>
       <Image
@@ -24,7 +25,7 @@ const About = () => (
       />
       <Spacer size={30} />
       <View style={styles.homeWrapper}>
-        <Button onPress={() => Actions.events()} >
+        <Button onPress={() => props.navigation.navigate('Events')} >
           <Icon name="calendar" />
           <View><Text>Ver meus eventos no Live QI Plus</Text></View>
         </Button>
@@ -33,4 +34,4 @@ const About = () => (
   </Container>
 );
 
-export default About;
+export default withNavigation(About);

@@ -22,7 +22,9 @@ class Locale extends React.Component {
 
   handleChange = locale => this.props.onChangeLocale(locale)
     .then(() => Actions.pop)
-    .catch(e => console.log(`Error: ${e}`));
+    .catch(e => {
+      // console.log(`Error: ${e}`)
+    });
 
   changeLocale = () => {
     // Form array of possible locales eg. ['en', 'it']

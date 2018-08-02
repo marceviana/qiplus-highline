@@ -3,7 +3,7 @@ import Store from '../store/event';
 export const initialState = Store;
 
 export default function eventSingleReducer(state = initialState, action) {
-  console.log(action.type);
+  // console.log(action.type);
   // console.log(action);
   switch (action.type) {
     case 'EVENTS_SETTER': {

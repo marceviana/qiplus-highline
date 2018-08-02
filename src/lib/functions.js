@@ -31,7 +31,7 @@ export function stringfy(tgt, sep, returnEmptyifNotValid) {
     try {
       target = target.toString();
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       if (returnEmptyifNotValid === true) target = '';
     }
   }

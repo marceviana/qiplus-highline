@@ -163,7 +163,9 @@ export function login(formData) {
               if (res.emailVerified === false) {
                 Firebase.auth().currentUser
                   .sendEmailVerification()
-                  .catch(() => console.log('Verification email failed to send'));
+                  .catch(() => {
+                  // console.log('Verification email failed to send')
+                  });
               }
 
               // Get User Data

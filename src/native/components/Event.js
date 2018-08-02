@@ -120,6 +120,7 @@ const EventView = (props) => {
     posts,
     notes,
     activeTab,
+    navigation
   } = props;
 
   // Loading
@@ -164,7 +165,7 @@ const EventView = (props) => {
 
   const dateFormatter = (datetime) => {
     if (!datetime) return '';
-    moment.locale(locale || 'pt');
+    moment.locale('pt-br');
     const formattedDate = moment(datetime).calendar();
     return formattedDate || '';
   };
@@ -226,11 +227,11 @@ const EventView = (props) => {
                   <Media media={item.media} />
                 </View>
                 <Card transparent style={styles.card}>
-                  <Avatar 
+                  <Avatar
                     style={styles.avatar}
                     iconStyle={styles.avatarIcon}
                     thumbStyle={styles.avatarThumbnail}
-                    src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''} 
+                    src={(wpUsers[Number(item.user)] && wpUsers[Number(item.user)].avatar) || ''}
                   />
                   <View style={styles.pillWrapper}>
                     <Text note style={styles.dateTime}>{dateFormatter(item.datetime)}</Text>
@@ -272,13 +273,10 @@ const EventView = (props) => {
           /> }
 
           <Spacer size={20} />
-          
+
         </View>
-        
+
       </Content>
-
-      <EventFooter eventId={eventId} activeTab={activeTab} />
-
     </Container>
   );
 };

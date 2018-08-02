@@ -8,8 +8,9 @@ import Loading from './Loading';
 import Error from './Error';
 import Header from './Header';
 import Spacer from './Spacer';
+import {withNavigation} from "react-navigation";
 
-const NoEvents = ({ member }) => (
+const NoEvents = ({ member, navigation }) => (
     (!!member && !!member.email) ?
     <View style={{ padding: 30 }}>
       <Text style={{ fontSize: 28 }}>Ops...</Text>
@@ -18,7 +19,7 @@ const NoEvents = ({ member }) => (
         Parece que você não está inscrito em nenuhum evento ativo no Live QI Plus
       </Text>
       <Spacer size={20} />
-      <Button primary onPress={() => Actions.home()}>
+      <Button primary onPress={() => navigation.navigate('Home')}>
         <Icon name="home" />
         <Text style={{ fontSize: 18 }}>Voltar ao início</Text>
       </Button>
@@ -26,12 +27,12 @@ const NoEvents = ({ member }) => (
     :
     <View>
       <Spacer size={20} />
-      <Button block iconLeft onPress={() => Actions.login()} >
+      <Button block iconLeft onPress={() => navigation.navigate('Login')} >
         <Icon name="log-in" />
         <Text>Fazer login no Live QI Plus</Text>
       </Button>
       <Spacer size={50} />
-      <Button block iconLeft onPress={() => Actions.signUp()} >
+      <Button block iconLeft onPress={() => navigation.navigate('SignUp')} >
         <Icon name="person-add" />
         <Text>Criar uma conta no Live QI Plus</Text>
       </Button>
@@ -47,6 +48,7 @@ const EventListing = ({
   member,
   reFetch,
   eventSetter,
+  navigation
 }) => {
   // Loading
   if (loading) return <Loading />;
@@ -58,7 +60,7 @@ const EventListing = ({
 
   const onPress = (item) => {
     eventSetter(item.id);
-    return Actions.liveposts({ match: { params: { id: String(item.id) } } });
+    return navigation.navigate('Event',{id: String(item.id)});
   };
 
   return (
@@ -71,7 +73,7 @@ const EventListing = ({
             ('Faça login ou crie uma conta no Live QI Plus para entrar em seus eventos')
           }
         />
-        {!events.length && <NoEvents member={member}/>}
+        {!events.length && <NoEvents navigation={navigation} member={member}/>}
         {loader && <Spinner color="blue" />}
         <FlatList
           numColumns={1}
@@ -140,4 +142,4 @@ EventListing.defaultProps = {
   reFetch: null,
 };
 
-export default EventListing;
+export default withNavigation(EventListing);

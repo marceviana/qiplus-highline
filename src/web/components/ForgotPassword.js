@@ -55,7 +55,9 @@ class ForgotPassword extends React.Component {
     event.preventDefault();
     this.props.onFormSubmit(this.state)
       .then(() => this.props.history.push('/login'))
-      .catch(e => console.log(`Error: ${e}`));
+      .catch(e => {
+        // console.log(`Error: ${e}`)
+      });
   }
 
   render() {

@@ -58,7 +58,9 @@ export function getMeals() {
         type: 'MEALS_REPLACE',
         data: meals,
       }));
-    }).catch(reject)).catch(e => console.log(e));
+    }).catch(reject)).catch(e => {
+      // console.log(e)
+  });
 }
 
 /**
@@ -85,5 +87,7 @@ export function getRecipes() {
         type: 'RECIPES_REPLACE',
         data: recipes,
       }));
-    })).catch(e => console.log(e));
+    })).catch(e => {
+      // console.log(e)
+  });
 }

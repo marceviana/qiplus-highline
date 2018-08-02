@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { login } from '../actions/member';
+import {withNavigation} from "react-navigation";
 
 const Login = ({
   Layout,
@@ -13,8 +14,10 @@ const Login = ({
   infoMessage,
   errorMessage,
   successMessage,
+  navigation
 }) => (
   <Layout
+    navigation={navigation}
     member={member}
     locale={locale}
     loading={isLoading}
@@ -56,4 +59,4 @@ const mapDispatchToProps = {
   onFormSubmit: login,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(withNavigation(Login));

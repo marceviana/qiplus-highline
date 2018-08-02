@@ -21,7 +21,7 @@ import EventNavBar from './EventNavBar';
 import Timer from './Timer';
 import Avatar from './Avatar';
 
-export const dateFormatter = (datetime, locale = 'pt') => {
+export const dateFormatter = (datetime, locale = 'pt-br') => {
   if (!datetime) return '';
   moment.locale(locale);
   const formattedDate = moment(datetime).calendar();
@@ -61,7 +61,7 @@ const EventView = (props) => {
   const timeline = isPitch ? notes : posts;
 
   const ActionLink = ({ action_link, deadline }) => (
-    isPitch && action_link && 
+    isPitch && action_link &&
     (!deadline || new Date(deadline).getTime() < new Date().getTime()) && (
     <CardFooter style={{ fontSize: 13 }}>
       <Timer href={action_link} deadline={deadline} />

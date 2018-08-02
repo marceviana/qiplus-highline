@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { getEvents, setEventsError, eventSetter } from '../actions/events';
+import {withNavigation} from "react-navigation";
 
 class EventListing extends Component {
   static propTypes = {
@@ -36,7 +37,7 @@ class EventListing extends Component {
     */
   fetchEvents = () => this.props.getEvents()
     .catch((err) => {
-      console.log(`Error: ${err}`);
+      // console.log(`Error: ${err}`);
       return this.props.setEventsError(err);
     })
 
@@ -80,4 +81,4 @@ const mapDispatchToProps = {
   eventSetter,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventListing);
+export default connect(mapStateToProps, mapDispatchToProps)(withNavigation(EventListing));

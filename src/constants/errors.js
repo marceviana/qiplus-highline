@@ -1,5 +1,5 @@
 
-const locale = 'pt';
+const locale = 'pt-br';
 
 const errors = {
   en: {
@@ -30,7 +30,7 @@ const errors = {
     // Locale
     localeDoesNotExist: 'Sorry, we do not support that local',
   },
-  pt: {
+  'pt-br': {
     // Defaults
     default: 'Hmm, ocorreu um erro inesperado',
     timeout: 'Server Timed Out. Check your internet connection',

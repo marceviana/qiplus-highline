@@ -32,7 +32,9 @@ export function listenToPosts(eventId) {
         type: 'POSTS_REPLACE',
         data: posts,
       }));
-    })).catch(e => console.log(e));
+    })).catch(e => {
+      // console.log(e)
+  });
 }
 
 export function listenToNotes(eventId) {
@@ -50,7 +52,9 @@ export function listenToNotes(eventId) {
         type: 'NOTES_REPLACE',
         data: notes,
       }));
-    })).catch(e => console.log(e));
+    })).catch(e => {
+      console.log(e)
+  });
 }
 
 export function getPosts(addedData) {
@@ -75,7 +79,9 @@ export function getPosts(addedData) {
           type: ACTION_TYPE,
           data: posts,
         }));
-      }).catch(reject)).catch(e => console.log(e));
+      }).catch(reject)).catch(e => {
+        // console.log(e)
+  });
 }
 
 export function setLoading() {
@@ -100,7 +106,7 @@ export function addComment(commentData) {
     const postRef = FirebaseRef.child(`${childKey}/${eventId}/${postId}`);
 
     const failureCallback = (e) => {
-      console.log('failureCallback', e);
+      // console.log('failureCallback', e);
       reject(dispatch({
         type: 'POSTS_ERROR',
         data: e,
@@ -124,7 +130,9 @@ export function addComment(commentData) {
     resolve(dispatch({
       type: 'POSTS_FETCHING',
     }));
-  }).catch(e => console.log(e));
+  }).catch(e => {
+    // console.log(e)
+  });
 }
 
 export function addPost(postData) {
@@ -142,7 +150,7 @@ export function addPost(postData) {
     const lastRef = postsRef.orderByKey().limitToLast(1);
 
     const failureCallback = (e) => {
-      console.log('failureCallback', e);
+      // console.log('failureCallback', e);
       reject(dispatch({
         type: 'POSTS_ERROR',
         data: e,
@@ -172,7 +180,9 @@ export function addPost(postData) {
     resolve(dispatch({
       type: 'POSTS_FETCHING',
     }));
-  }).catch(e => console.log(e));
+  }).catch(e => {
+    // console.log(e)
+  });
 }
 
 export function toggleLike(likeData) {
@@ -257,7 +267,9 @@ export function getParticipants(participantIds) {
         type: 'WP_USERS_REPLACE',
         data: wpUsers,
       }));
-    })).catch(e => console.log(e));
+    })).catch(e => {
+      // console.log(e)
+  });
 }
 
 export function uploadFile(data) {
