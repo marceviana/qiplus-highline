@@ -15,6 +15,7 @@ import Loading from './components/Loading';
 // Hide StatusBar on Android as it overlaps tabs
 if (Platform.OS === 'android') StatusBar.setHidden(true);
 
+
 const App = ({ store, persistor }) => (
   <Root>
     <Provider store={store}>

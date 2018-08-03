@@ -100,8 +100,6 @@ const ParticipantsListing = (props) => {
 
       </Content>
 
-      <EventFooter eventId={eventId} activeTab={activeTab} />
-
     </Container>
   );
 };
